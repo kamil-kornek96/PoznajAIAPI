@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using PetSpace.Data;
+using PetSpace.Data.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -32,6 +36,11 @@ builder.Services.AddSingleton<JwtService>(provider =>
     var issuer = config["JwtSettings:Issuer"];
     var audience = config["JwtSettings:Audicence"];
     return new JwtService(secretKey, issuer, audience);
+});
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseSqlServer(config.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.AddAuthorization();

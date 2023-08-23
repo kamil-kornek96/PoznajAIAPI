@@ -1,71 +1,88 @@
-﻿using PetSpaceAPI.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using AutoMapper;
+using Microsoft.Extensions.Logging;
+using PetSpaceAPI.Models;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using PetSpace.Data.Repositories;
+using PetSpace.Data.Models;
 
 namespace PetSpaceAPI.Services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Security.Cryptography;
-    using System.Text;
+
 
     public interface IUserService
     {
-        User Authenticate(string username, string password);
-        IEnumerable<User> GetAllUsers();
-        User GetUserById(int id);
-        bool IsUsernameTaken(string username);
-        void CreateUser(User user);
+        Task<UserDto> Authenticate(string username, string password);
+        Task<IEnumerable<UserDto>> GetAllUsers();
+        Task<UserDto> GetUserById(int id);
+        Task<bool> IsUsernameTaken(string username);
+        Task CreateUser(UserDto user);
     }
 
     public class UserService : IUserService
     {
-        private List<User> _users = new List<User>();
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
+        private readonly ILogger<UserService> _logger;
 
-        public User Authenticate(string username, string password)
+        public UserService(IUserRepository userRepository, IMapper mapper, ILogger<UserService> logger)
         {
-            var user = _users.SingleOrDefault(u => u.Username == username);
+            _userRepository = userRepository;
+            _mapper = mapper;
+            _logger = logger;
+        }
 
-            if (user == null)
+        public async Task<UserDto> Authenticate(string username, string password)
+        {
+            var user = await GetUserById(username);
+
+            if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
                 return null;
             }
 
-            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
-            {
-                return null;
-            }
-
-            return user;
+            return _mapper.Map<UserDto>(user);
         }
 
-        public IEnumerable<User> GetAllUsers()
+        public async Task<IEnumerable<UserDto>> GetAllUsers()
         {
-            return _users;
+            var users = await _userRepository.GetAllUsers();
+            return _mapper.Map<IEnumerable<UserDto>>(users);
         }
 
-        public User GetUserById(int id)
+        public async Task<UserDto> GetUserById(int id)
         {
-            return _users.FirstOrDefault(u => u.Id == id);
+            var user = await _userRepository.GetUserById(id);
+            return _mapper.Map<UserDto>(user);
         }
 
-        public bool IsUsernameTaken(string username)
+        public async Task<UserDto> GetUserById(string userName)
         {
-            return _users.Any(u => u.Username == username);
+            var user = await _userRepository.GetUserByUsername(userName);
+            return _mapper.Map<UserDto>(user);
         }
 
-        public void CreateUser(User user)
+        public async Task<bool> IsUsernameTaken(string username)
         {
+            return await _userRepository.UsernameExists(username);
+        }
+
+        public async Task CreateUser(UserDto userDto)
+        {
+            var user = _mapper.Map<User>(userDto);
             byte[] passwordHash, passwordSalt;
-            CreatePasswordHash(user.Password, out passwordHash, out passwordSalt);
+            CreatePasswordHash(userDto.Password, out passwordHash, out passwordSalt);
 
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
+            user.PasswordHash = passwordHash.ToString();
+            user.PasswordSalt = passwordSalt.ToString();
 
-            user.Id = _users.Max(u => u.Id) + 1;
-            _users.Add(user);
+            await _userRepository.CreateUser(user);
+            _logger.LogInformation("User created: {@user}", user);
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

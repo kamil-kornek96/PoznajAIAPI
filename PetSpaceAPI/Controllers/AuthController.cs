@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using PetSpaceAPI.Services;
 using PetSpaceAPI.Models.DTO;
+using PetSpaceAPI.Models;
 
 namespace PetSpaceAPI.Controllers
 {
@@ -24,9 +25,9 @@ namespace PetSpaceAPI.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login(LoginRequestDto model)
+        public async Task<IActionResult> Login(LoginRequestDto model)
         {
-            var user = _userService.Authenticate(model.Username, model.Password);
+            var user = await _userService.Authenticate(model.Username, model.Password);
 
             if (user == null)
             {
@@ -39,21 +40,21 @@ namespace PetSpaceAPI.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(RegisterRequestDto model)
+        public async Task<IActionResult> Register(RegisterRequestDto model)
         {
             // Sprawdź, czy użytkownik o podanej nazwie nie istnieje już w bazie danych
-            if (_userService.IsUsernameTaken(model.Username))
+            if (await _userService.IsUsernameTaken(model.Username))
             {
                 return BadRequest("Username already taken.");
             }
 
-            var user = new User
+            var user = new UserDto
             {
                 Username = model.Username,
                 // Możesz dodatkowo przekazać i zahaszować hasło itp.
             };
 
-            _userService.CreateUser(user);
+            await _userService.CreateUser(user);
 
             // Tutaj możesz dodać logikę, która w razie potrzeby generuje token JWT po rejestracji
 
