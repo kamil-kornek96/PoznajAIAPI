@@ -1,0 +1,29 @@
+# Visual Studio temporary files
+.vscode/
+.vs/
+bin/
+obj/
+
+# User-specific files
+*.userprefs
+*.suo
+*.user
+
+# Compiled binaries
+*.dll
+*.exe
+*.pdb
+
+# NuGet
+packages/
+
+# User-specific files from previous versions of the .NET SDK
+ProjectAssemblies/
+.vscode/
+
+# .NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Rider
+.idea/
+*.sln.iml
