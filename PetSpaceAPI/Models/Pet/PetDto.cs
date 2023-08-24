@@ -1,4 +1,4 @@
-﻿namespace PetSpaceAPI.Models.Pets
+﻿namespace PetSpaceAPI.Models.Pet
 {
     public class PetDto
     {

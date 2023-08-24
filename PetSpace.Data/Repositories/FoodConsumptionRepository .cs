@@ -1,11 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetSpace.Data.Data;
 using PetSpace.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PetSpace.Data.Repositories.Interfaces;
 
 namespace PetSpace.Data.Repositories
 {
@@ -23,6 +19,11 @@ namespace PetSpace.Data.Repositories
             return await _dbContext.FoodConsumptions.FindAsync(consumptionId);
         }
 
+        public IQueryable<FoodConsumption> GetFoodConsumptionsForPet(int consumptionId)
+        {
+            return _dbContext.FoodConsumptions.Where(f => f.PetId == consumptionId);
+        }
+
         public async Task<double> GetTotalAmountConsumedForPet(int petId)
         {
             return await _dbContext.FoodConsumptions
@@ -36,10 +37,10 @@ namespace PetSpace.Data.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public void Update(FoodConsumption consumption)
+        public async Task<bool> Update(FoodConsumption consumption)
         {
             _dbContext.FoodConsumptions.Update(consumption);
-            _dbContext.SaveChanges();
+            return _dbContext.SaveChanges() > 0;
         }
 
         public async Task Delete(int consumptionId)
@@ -51,5 +52,6 @@ namespace PetSpace.Data.Repositories
                 await _dbContext.SaveChangesAsync();
             }
         }
+
     }
 }

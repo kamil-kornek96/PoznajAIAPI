@@ -1,4 +1,4 @@
-﻿namespace PetSpaceAPI.Models.Food
+﻿namespace PetSpaceAPI.Models.FoodInventory
 {
     public class FoodInventoryDto
     {

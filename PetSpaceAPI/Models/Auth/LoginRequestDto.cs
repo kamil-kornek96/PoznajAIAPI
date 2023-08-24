@@ -1,4 +1,4 @@
-﻿namespace PetSpaceAPI.Models.DTO
+﻿namespace PetSpaceAPI.Models.Auth
 {
     public class LoginRequestDto
     {

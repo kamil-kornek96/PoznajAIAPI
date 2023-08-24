@@ -1,18 +1,14 @@
 ﻿using PetSpace.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PetSpace.Data.Repositories
+namespace PetSpace.Data.Repositories.Interfaces
 {
     public interface IFoodConsumptionRepository
     {
         Task<FoodConsumption> GetFoodConsumptionById(int consumptionId);
+        IQueryable<FoodConsumption> GetFoodConsumptionsForPet(int consumptionId);
         Task<double> GetTotalAmountConsumedForPet(int petId);
         Task Add(FoodConsumption consumption);
-        void Update(FoodConsumption consumption);
+        Task<bool> Update(FoodConsumption consumption);
         Task Delete(int consumptionId);
     }
 }

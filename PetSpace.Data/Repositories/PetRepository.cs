@@ -1,12 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PetSpace.Data.Data;
+﻿using PetSpace.Data.Data;
 using PetSpace.Data.Models;
 using PetSpace.Data.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PetSpace.Data.Repositories
 {
@@ -24,11 +18,10 @@ namespace PetSpace.Data.Repositories
             return await _dbContext.Pets.FindAsync(petId);
         }
 
-        public async Task<IEnumerable<Pet>> GetPetsByUserId(int userId)
+        public IQueryable<Pet> GetPetsByUserId(int userId)
         {
-            return await _dbContext.Pets
-                .Where(p => p.User.Any(u => u.Id == userId))
-                .ToListAsync();
+            return _dbContext.Pets
+                .Where(p => p.User.Any(u => u.Id == userId));
         }
 
         public async Task Add(Pet pet)
@@ -37,10 +30,10 @@ namespace PetSpace.Data.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public void Update(Pet pet)
+        public async Task<bool> Update(Pet pet)
         {
             _dbContext.Pets.Update(pet);
-            _dbContext.SaveChanges();
+            return _dbContext.SaveChanges() > 0;
         }
 
         public async Task Delete(int petId)

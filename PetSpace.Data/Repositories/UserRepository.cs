@@ -1,11 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetSpace.Data.Data;
 using PetSpace.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PetSpace.Data.Repositories.Interfaces;
 
 namespace PetSpace.Data.Repositories
 {
@@ -35,8 +31,16 @@ namespace PetSpace.Data.Repositories
 
         public async Task CreateUser(User user)
         {
-            await _dbContext.Users.AddAsync(user);
-            await _dbContext.SaveChangesAsync();
+            try
+            {
+                user.Role = _dbContext.Roles.First(r => r.Name == UserRole.User);
+                await _dbContext.Users.AddAsync(user);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                var test = ex.Message;
+            }
         }
 
         public async Task UpdateUser(User user)

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace PetSpace.Data.Models
 {
@@ -30,15 +24,15 @@ namespace PetSpace.Data.Models
         public string Username { get; set; }
 
         [Required]
-        [MaxLength(100)]
-        public string PasswordHash { get; set; }
+        [MaxLength(200)]
+        public byte[] PasswordHash { get; set; }
 
         [Required]
-        [MaxLength(100)]
-        public string PasswordSalt { get; set; }
+        [MaxLength(200)]
+        public byte[] PasswordSalt { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         public Role Role { get; set; }
 

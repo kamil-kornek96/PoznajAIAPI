@@ -12,8 +12,8 @@ using PetSpace.Data.Data;
 namespace PetSpace.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230823195641_AddBasicsEntities")]
-    partial class AddBasicsEntities
+    [Migration("20230824155502_CreateDB")]
+    partial class CreateDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -45,7 +45,31 @@ namespace PetSpace.Data.Migrations
 
                     b.HasIndex("PetId");
 
-                    b.ToTable("Feeding");
+                    b.ToTable("Feedings");
+                });
+
+            modelBuilder.Entity("PetSpace.Data.Models.FoodConsumption", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<double>("AmountInGrams")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PetId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PetId");
+
+                    b.ToTable("FoodConsumptions");
                 });
 
             modelBuilder.Entity("PetSpace.Data.Models.FoodInventory", b =>
@@ -70,7 +94,7 @@ namespace PetSpace.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("FoodInventory");
+                    b.ToTable("FoodInventories");
                 });
 
             modelBuilder.Entity("PetSpace.Data.Models.Pet", b =>
@@ -98,7 +122,7 @@ namespace PetSpace.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Pet");
+                    b.ToTable("Pets");
                 });
 
             modelBuilder.Entity("PetSpace.Data.Models.Role", b =>
@@ -143,15 +167,15 @@ namespace PetSpace.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<byte[]>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varbinary(100)");
 
-                    b.Property<string>("PasswordSalt")
+                    b.Property<byte[]>("PasswordSalt")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varbinary(100)");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
@@ -197,7 +221,7 @@ namespace PetSpace.Data.Migrations
 
                     b.HasIndex("PetId");
 
-                    b.ToTable("VetVisit");
+                    b.ToTable("VetVisits");
                 });
 
             modelBuilder.Entity("PetUser", b =>
@@ -219,6 +243,17 @@ namespace PetSpace.Data.Migrations
                 {
                     b.HasOne("PetSpace.Data.Models.Pet", "Pet")
                         .WithMany("Feedings")
+                        .HasForeignKey("PetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pet");
+                });
+
+            modelBuilder.Entity("PetSpace.Data.Models.FoodConsumption", b =>
+                {
+                    b.HasOne("PetSpace.Data.Models.Pet", "Pet")
+                        .WithMany()
                         .HasForeignKey("PetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

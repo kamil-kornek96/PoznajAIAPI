@@ -2,11 +2,6 @@
 using PetSpace.Data.Data;
 using PetSpace.Data.Models;
 using PetSpace.Data.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PetSpace.Data.Repositories
 {
@@ -24,6 +19,11 @@ namespace PetSpace.Data.Repositories
             return await _dbContext.FoodInventories.FindAsync(inventoryId);
         }
 
+        public IQueryable<FoodInventory> GetFoodInventoryForUser(int userId)
+        {
+            return _dbContext.FoodInventories.Where(f => f.UserId == userId);
+        }
+
         public async Task<double> GetTotalQuantityForUser(int userId)
         {
             return await _dbContext.FoodInventories
@@ -31,16 +31,18 @@ namespace PetSpace.Data.Repositories
                 .SumAsync(fi => fi.QuantityInGrams);
         }
 
-        public async Task Add(FoodInventory inventory)
+        public async Task<FoodInventory> Add(FoodInventory foodInventory)
         {
-            await _dbContext.FoodInventories.AddAsync(inventory);
+            await _dbContext.FoodInventories.AddAsync(foodInventory);
             await _dbContext.SaveChangesAsync();
+            return foodInventory;
         }
 
-        public void Update(FoodInventory inventory)
+
+        public async Task<bool> Update(FoodInventory inventory)
         {
             _dbContext.FoodInventories.Update(inventory);
-            _dbContext.SaveChanges();
+            return _dbContext.SaveChanges() > 0;
         }
 
         public async Task Delete(int inventoryId)

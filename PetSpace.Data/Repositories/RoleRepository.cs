@@ -1,11 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetSpace.Data.Data;
 using PetSpace.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PetSpace.Data.Repositories.Interfaces;
 
 namespace PetSpace.Data.Repositories
 {

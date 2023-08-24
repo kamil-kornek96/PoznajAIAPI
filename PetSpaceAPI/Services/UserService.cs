@@ -1,28 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using AutoMapper;
+using PetSpace.Data.Models;
+using PetSpace.Data.Repositories.Interfaces;
+using PetSpaceAPI.Models.User;
 using System.Security.Cryptography;
 using System.Text;
-using AutoMapper;
-using Microsoft.Extensions.Logging;
-using PetSpaceAPI.Models;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using PetSpace.Data.Repositories;
-using PetSpace.Data.Models;
 
 namespace PetSpaceAPI.Services
 {
-
-
-    public interface IUserService
-    {
-        Task<UserDto> Authenticate(string username, string password);
-        Task<IEnumerable<UserDto>> GetAllUsers();
-        Task<UserDto> GetUserById(int id);
-        Task<bool> IsUsernameTaken(string username);
-        Task CreateUser(UserDto user);
-    }
 
     public class UserService : IUserService
     {
@@ -78,8 +62,8 @@ namespace PetSpaceAPI.Services
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(userDto.Password, out passwordHash, out passwordSalt);
 
-            user.PasswordHash = passwordHash.ToString();
-            user.PasswordSalt = passwordSalt.ToString();
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
 
             await _userRepository.CreateUser(user);
             _logger.LogInformation("User created: {@user}", user);
@@ -91,6 +75,7 @@ namespace PetSpaceAPI.Services
 
             passwordSalt = hmac.Key;
             passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+
         }
 
         private bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)

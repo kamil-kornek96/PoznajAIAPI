@@ -1,6 +1,6 @@
-﻿namespace PetSpaceAPI.Models.DTO
+﻿namespace PetSpaceAPI.Models.Auth
 {
-    public class AuthResponseDto
+    public class TokenResponseDto
     {
         public string Token { get; set; }
     }

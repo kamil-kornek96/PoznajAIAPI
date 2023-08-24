@@ -1,11 +1,6 @@
 ﻿using PetSpace.Data.Data;
 using PetSpace.Data.Models;
 using PetSpace.Data.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PetSpace.Data.Repositories
 {
@@ -23,16 +18,21 @@ namespace PetSpace.Data.Repositories
             return await _dbContext.VetVisits.FindAsync(visitId);
         }
 
+        public IQueryable<VetVisit> GetVetVisitsForPet(int petId)
+        {
+            return _dbContext.VetVisits.Where(v => v.PetId == petId);
+        }
+
         public async Task Add(VetVisit visit)
         {
             await _dbContext.VetVisits.AddAsync(visit);
             await _dbContext.SaveChangesAsync();
         }
 
-        public void Update(VetVisit visit)
+        public async Task<bool> Update(VetVisit visit)
         {
             _dbContext.VetVisits.Update(visit);
-            _dbContext.SaveChanges();
+            return _dbContext.SaveChanges() > 0;
         }
 
         public async Task Delete(int visitId)

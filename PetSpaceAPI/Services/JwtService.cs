@@ -1,10 +1,11 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using System;
+using PetSpaceAPI.Models.User;
+using PetSpaceAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-public class JwtService
+public class JwtService : IJwtService
 {
     private readonly string _secretKey;
     private readonly string _issuer;
@@ -17,7 +18,7 @@ public class JwtService
         _audience = audience;
     }
 
-    public string GenerateToken(int userId)
+    public string GenerateToken(UserDto userDto)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_secretKey);
@@ -25,9 +26,11 @@ public class JwtService
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim(ClaimTypes.Name, userId.ToString())
-            }),
-            Expires = DateTime.UtcNow.AddHours(1), // Token expiration time
+            new Claim(ClaimTypes.Name, userDto.Username),
+            new Claim(ClaimTypes.Email, userDto.Email),
+            //new Claim(ClaimTypes.Role, userDto.Role) // Dodaj claim z rolą
+        }),
+            Expires = DateTime.UtcNow.AddHours(12), // Token expiration time
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             Issuer = _issuer,
             Audience = _audience
