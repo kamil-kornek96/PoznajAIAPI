@@ -1,6 +1,6 @@
-﻿using PetSpaceAPI.Models.User;
+﻿using PoznajAI.Models.User;
 
-namespace PetSpaceAPI.Services
+namespace PoznajAI.Services
 {
     public interface IUserService
     {

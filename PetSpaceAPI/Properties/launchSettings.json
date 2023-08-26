@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "PetSpaceAPI": {
+    "PoznajAI": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

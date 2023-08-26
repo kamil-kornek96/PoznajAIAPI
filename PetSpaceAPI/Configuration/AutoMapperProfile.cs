@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
-using PetSpace.Data.Models;
-using PetSpaceAPI.Models.Auth;
-using PetSpaceAPI.Models.Feeding;
-using PetSpaceAPI.Models.FoodConsumption;
-using PetSpaceAPI.Models.FoodInventory;
-using PetSpaceAPI.Models.Pet;
-using PetSpaceAPI.Models.User;
-using PetSpaceAPI.Models.VetVisit;
+using PoznajAI.Data.Models;
+using PoznajAI.Models.Auth;
+using PoznajAI.Models.CourseModule;
+using PoznajAI.Models.CourseUser;
+using PoznajAI.Models.LessonAssignment;
+using PoznajAI.Models.LessonComment;
+using PoznajAI.Models.LessonRating;
+using PoznajAI.Models.User;
 
-namespace PetSpaceAPI.Configuration
+
+namespace PoznajAI.Configuration
 {
     public class AutoMapperProfiles : Profile
     {
@@ -16,11 +17,31 @@ namespace PetSpaceAPI.Configuration
         {
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<RegisterRequestDto, UserDto>().ReverseMap();
-            CreateMap<Pet, PetDto>().ReverseMap();
-            CreateMap<Feeding, FeedingDto>().ReverseMap();
-            CreateMap<VetVisit, VetVisitDto>().ReverseMap();
-            CreateMap<FoodConsumption, FoodConsumptionDto>().ReverseMap();
-            CreateMap<FoodInventory, FoodInventoryDto>().ReverseMap();
+
+            #region DTO
+            CreateMap<CourseUserDto, CourseUser>().ReverseMap();
+            CreateMap<CourseModuleDto, CourseModule>().ReverseMap();
+            CreateMap<LessonAssignmentDto, LessonAssignment>().ReverseMap();
+            CreateMap<LessonCommentDto, LessonComment>().ReverseMap();
+            CreateMap<LessonRatingDto, LessonRating>().ReverseMap();
+            #endregion
+
+            #region DTO CREATE
+            CreateMap<CourseUserCreateDto, CourseUser>().ReverseMap();
+            CreateMap<CourseModuleCreateDto, CourseModule>().ReverseMap();
+            CreateMap<LessonAssignmentCreateDto, LessonAssignment>().ReverseMap();
+            CreateMap<LessonCommentCreateDto, LessonComment>().ReverseMap();
+            CreateMap<LessonRatingCreateDto, LessonRating>().ReverseMap();
+            #endregion
+
+            #region DTO UPDATE
+            CreateMap<CourseUserUpdateDto, CourseUser>().ReverseMap();
+            CreateMap<CourseModuleUpdateDto, CourseModule>().ReverseMap();
+            CreateMap<LessonAssignmentUpdateDto, LessonAssignment>().ReverseMap();
+            CreateMap<LessonCommentUpdateDto, LessonComment>().ReverseMap();
+            CreateMap<LessonRatingUpdateDto, LessonRating>().ReverseMap();
+            #endregion
+
         }
     }
 }

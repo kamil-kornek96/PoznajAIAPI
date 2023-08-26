@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PetSpaceAPI.Models.Auth
+namespace PoznajAI.Models.Auth
 {
     public class RegisterRequestDto
     {

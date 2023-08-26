@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PetSpaceAPI.Models.Auth;
-using PetSpaceAPI.Models.User;
-using PetSpaceAPI.Services;
+using PoznajAI.Models.Auth;
+using PoznajAI.Models.User;
+using PoznajAI.Services;
 
-namespace PetSpaceAPI.Controllers
+namespace PoznajAI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

@@ -1,4 +1,4 @@
-﻿namespace PetSpaceAPI.Models.User
+﻿namespace PoznajAI.Models.User
 {
     public class UserDto
     {

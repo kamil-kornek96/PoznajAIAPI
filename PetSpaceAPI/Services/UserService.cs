@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using PetSpace.Data.Models;
-using PetSpace.Data.Repositories.Interfaces;
-using PetSpaceAPI.Models.User;
+using PoznajAI.Data.Models;
+using PoznajAI.Data.Repositories.Interfaces;
+using PoznajAI.Models.User;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace PetSpaceAPI.Services
+namespace PoznajAI.Services
 {
 
     public class UserService : IUserService

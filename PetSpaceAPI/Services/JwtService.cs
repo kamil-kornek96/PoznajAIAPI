@@ -1,6 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using PetSpaceAPI.Models.User;
-using PetSpaceAPI.Services;
+using PoznajAI.Models.User;
+using PoznajAI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

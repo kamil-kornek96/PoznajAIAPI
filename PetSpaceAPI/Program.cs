@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using PetSpace.Data.Data;
-using PetSpace.Data.Repositories;
-using PetSpace.Data.Repositories.Interfaces;
-using PetSpaceAPI.Configuration;
-using PetSpaceAPI.Services;
+using PoznajAI.Configuration;
+using PoznajAI.Data.Data;
+using PoznajAI.Data.Repositories;
+using PoznajAI.Data.Repositories.Interfaces;
+using PoznajAI.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,18 +36,18 @@ builder.Services.AddAuthentication(x =>
 
 
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IPetService, PetService>();
-builder.Services.AddScoped<IFeedingService, FeedingService>();
-builder.Services.AddScoped<IVetVisitService, VetVisitService>();
-builder.Services.AddScoped<IFoodConsumptionService, FoodConsumptionService>();
-builder.Services.AddScoped<IFoodInventoryService, FoodInventoryService>();
+builder.Services.AddScoped<ILessonCommentService, LessonCommentService>();
+builder.Services.AddScoped<ILessonAssignmentService, LessonAssignmentService>();
+builder.Services.AddScoped<ILessonRatingService, LessonRatingService>();
+builder.Services.AddScoped<ICourseModuleService, CourseModuleService>();
+builder.Services.AddScoped<ICourseUserService, CourseUserService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IPetRepository, PetRepository>();
-builder.Services.AddScoped<IFeedingRepository, FeedingRepository>();
-builder.Services.AddScoped<IVetVisitRepository, VetVisitRepository>();
-builder.Services.AddScoped<IFoodConsumptionRepository, FoodConsumptionRepository>();
-builder.Services.AddScoped<IFoodInventoryRepository, FoodInventoryRepository>();
+builder.Services.AddScoped<ILessonCommentRepository, LessonCommentRepository>();
+builder.Services.AddScoped<ILessonAssignmentRepository, LessonAssignmentRepository>();
+builder.Services.AddScoped<ILessonRatingRepository, LessonRatingRepository>();
+builder.Services.AddScoped<ICourseModuleRepository, CourseModuleRepository>();
+builder.Services.AddScoped<ICourseUserRepository, CourseUserRepository>();
 
 var mapperConfig = new MapperConfiguration(config =>
 {
