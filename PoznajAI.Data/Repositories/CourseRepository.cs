@@ -15,7 +15,8 @@ namespace PoznajAI.Data.Repositories
 
         public async Task<IEnumerable<Course>> GetAllCoursesForUser(Guid userId)
         {
-            return _dbContext.Users.Include(u => u.Courses).First(u => u.Id == userId).Courses;
+            var user = _dbContext.Users.Find(userId);
+            return _dbContext.Courses.Include(c => c.Lessons).Where(c => c.Users.Contains(user));
         }
 
         public async Task<IEnumerable<Course>> GetAllCourses()

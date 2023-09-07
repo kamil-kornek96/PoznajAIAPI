@@ -27,7 +27,8 @@ namespace PoznajAI.Services
                 var ownedCourses = await _CourseRepository.GetAllCoursesForUser(userId);
                 var allCourses = await _CourseRepository.GetAllCourses();
 
-                var availableCourses = allCourses.Where(c => !ownedCourses.Select(b => b.Id).Contains(c.Id)).ToList();
+
+                var availableCourses = allCourses.Where(course => !ownedCourses.Any(ownedCourse => ownedCourse.Id == course.Id)).ToList();
 
                 var responseDto = new UserCoursesResponseDto
                 {
@@ -39,11 +40,11 @@ namespace PoznajAI.Services
             }
             catch (Exception ex)
             {
-
                 _logger.LogError(ex, "Wystąpił błąd podczas pobierania kursów dla użytkownika.");
                 throw;
             }
         }
+
 
 
 
