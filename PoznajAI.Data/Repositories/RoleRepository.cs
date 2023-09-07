@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PoznajAI.Data.Data;
 using PoznajAI.Data.Models;
-using PoznajAI.Data.Repositories.Interfaces;
 
 namespace PoznajAI.Data.Repositories
 {
@@ -14,7 +13,7 @@ namespace PoznajAI.Data.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<Role> GetRoleById(int roleId)
+        public async Task<Role> GetRoleById(Guid roleId)
         {
             return await _dbContext.Roles.FindAsync(roleId);
         }
@@ -30,7 +29,7 @@ namespace PoznajAI.Data.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteRole(int roleId)
+        public async Task DeleteRole(Guid roleId)
         {
             var role = await _dbContext.Roles.FindAsync(roleId);
             if (role != null)

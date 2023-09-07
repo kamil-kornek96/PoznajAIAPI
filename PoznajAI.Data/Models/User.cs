@@ -4,7 +4,7 @@ namespace PoznajAI.Data.Models
 {
     public class User
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         [MaxLength(50)]
@@ -34,9 +34,9 @@ namespace PoznajAI.Data.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public Role Role { get; set; }
+        public ICollection<Role> Roles { get; set; }
 
-        public ICollection<CourseUser> EnrolledCourses { get; set; } = new List<CourseUser>();
+        public ICollection<Course> Courses { get; set; }
     }
 
 
