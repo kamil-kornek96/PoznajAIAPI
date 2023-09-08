@@ -20,10 +20,10 @@ namespace PoznajAI.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<LessonDto>> GetAllLessonsForCourse(Guid courseId)
+        public async Task<LessonDto> GetLessonById(Guid lessonId)
         {
-            var Lessons = await _LessonRepository.GetAllLessonsByCourse(courseId);
-            return _mapper.Map<IEnumerable<LessonDto>>(Lessons);
+            var Lessons = await _LessonRepository.GetLessonById(lessonId);
+            return _mapper.Map<LessonDto>(Lessons);
         }
 
 

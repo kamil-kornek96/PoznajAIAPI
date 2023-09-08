@@ -77,7 +77,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Pet Space API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "PoznajAI API", Version = "v1" });
 
     // Define JWT security scheme
     var securityScheme = new OpenApiSecurityScheme

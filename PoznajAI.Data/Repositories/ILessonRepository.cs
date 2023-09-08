@@ -6,7 +6,7 @@ namespace PoznajAI.Data.Repositories
     {
         Task CreateLesson(Lesson lesson);
         Task DeleteLesson(Guid lessonId);
-        Task<IEnumerable<Lesson>> GetAllLessonsByCourse(Guid courseId);
+        Task<Lesson> GetLessonById(Guid lessonId);
         Task UpdateLesson(Lesson lesson);
     }
 }

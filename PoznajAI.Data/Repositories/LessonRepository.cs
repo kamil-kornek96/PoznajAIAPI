@@ -13,9 +13,9 @@ namespace PoznajAI.Data.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Lesson>> GetAllLessonsByCourse(Guid courseId)
+        public async Task<Lesson> GetLessonById(Guid lessonId)
         {
-            return await _dbContext.Lessons.Where(l => l.CourseId == courseId).ToListAsync();
+            return await _dbContext.Lessons.FindAsync(lessonId);
         }
 
         public async Task CreateLesson(Lesson lesson)

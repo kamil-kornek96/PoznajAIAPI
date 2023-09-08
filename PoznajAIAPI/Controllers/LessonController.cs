@@ -19,13 +19,13 @@ namespace PoznajAI.Controllers
             _lessonService = lessonService;
         }
 
-        [HttpGet("course/{courseId}")]
-        public async Task<ActionResult<IEnumerable<LessonDto>>> GetAllLessonsForCourse(Guid courseId)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<LessonDto>> GetLessonById(Guid id)
         {
             try
             {
-                var lessons = await _lessonService.GetAllLessonsForCourse(courseId);
-                return Ok(lessons);
+                var lesson = await _lessonService.GetLessonById(id);
+                return Ok(lesson);
             }
             catch (Exception ex)
             {
