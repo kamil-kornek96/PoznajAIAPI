@@ -1,8 +1,6 @@
-﻿using PoznajAI.Data.Models;
-
-namespace PoznajAI.Services
+﻿namespace PoznajAI.Controllers
 {
-    public class CourseDto
+    public class CourseUpdateDto
     {
         public Guid Id { get; set; }
         public string Title { get; set; }

@@ -60,5 +60,51 @@ namespace PoznajAI.Controllers
                 return StatusCode(500, new { message = "An error occurred while creating the course." });
             }
         }
+
+        // Get a course by its ID
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CourseDto>> GetCourseById(Guid id)
+        {
+            try
+            {
+                var course = await _courseService.GetCourseById(id);
+
+                if (course == null)
+                {
+                    return NotFound(new { message = "Course not found." });
+                }
+
+                return Ok(course);
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions here (e.g., log the error).
+                return StatusCode(500, new { message = "An error occurred while fetching the course." });
+            }
+        }
+
+        // Update an existing course
+        [Authorize] // Add authorization if required
+        [HttpPut("update/{id}")]
+        public async Task<ActionResult> UpdateCourse(Guid id, CourseUpdateDto courseDto)
+        {
+            try
+            {
+                var existingCourse = await _courseService.GetCourseById(id);
+
+                if (existingCourse == null)
+                {
+                    return NotFound(new { message = "Course not found." });
+                }
+
+                await _courseService.UpdateCourse(id, courseDto);
+                return Ok(new { message = "Course updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions here (e.g., log the error).
+                return StatusCode(500, new { message = "An error occurred while updating the course." });
+            }
+        }
     }
 }

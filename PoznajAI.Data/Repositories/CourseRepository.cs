@@ -24,11 +24,11 @@ namespace PoznajAI.Data.Repositories
             return await _dbContext.Courses.ToListAsync();
         }
 
-        public async Task CreateCourse(Course Course)
+        public async Task CreateCourse(Course course)
         {
             try
             {
-                await _dbContext.Courses.AddAsync(Course);
+                await _dbContext.Courses.AddAsync(course);
                 await _dbContext.SaveChangesAsync();
 
             }
@@ -38,9 +38,16 @@ namespace PoznajAI.Data.Repositories
             }
         }
 
-        public async Task UpdateCourse(Course Course)
+        public async Task UpdateCourse(Course updatedCourse)
         {
-            _dbContext.Courses.Update(Course);
+            var existingCourse = await _dbContext.Courses.FindAsync(updatedCourse.Id);
+
+            if (existingCourse == null)
+            {
+                throw new InvalidOperationException("Course not found.");
+            }
+
+            _dbContext.Entry(existingCourse).CurrentValues.SetValues(updatedCourse);
             await _dbContext.SaveChangesAsync();
         }
 
@@ -52,6 +59,11 @@ namespace PoznajAI.Data.Repositories
                 _dbContext.Courses.Remove(Course);
                 await _dbContext.SaveChangesAsync();
             }
+        }
+
+        public async Task<Course> GetCourseById(Guid courseId)
+        {
+            return _dbContext.Courses.FirstOrDefault(c => c.Id == courseId);
         }
     }
 }

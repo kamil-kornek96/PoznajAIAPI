@@ -9,5 +9,6 @@ namespace PoznajAI.Data.Repositories
         Task<IEnumerable<Course>> GetAllCoursesForUser(Guid userId);
         Task<IEnumerable<Course>> GetAllCourses();
         Task UpdateCourse(Course Course);
+        Task<Course> GetCourseById(Guid id);
     }
 }

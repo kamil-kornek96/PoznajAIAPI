@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using PoznajAI.Controllers;
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
 using System.Security.Cryptography;
@@ -55,6 +57,49 @@ namespace PoznajAI.Services
             _logger.LogInformation("Course created: {@Course}", Course);
         }
 
+        public async Task<CourseDto> GetCourseById(Guid id)
+        {
+            try
+            {
+                var course = await _CourseRepository.GetCourseById(id);
+
+                if (course == null)
+                {
+                    return null;
+                }
+
+                var courseDto = _mapper.Map<CourseDto>(course);
+                return courseDto;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching the course by ID.");
+                return null;
+            }
+        }
+
+        public async Task<bool> UpdateCourse(Guid id, CourseUpdateDto courseDto)
+        {
+            try
+            {
+                var existingCourse = await _CourseRepository.GetCourseById(id);
+
+                if (existingCourse == null)
+                {
+                    return false;
+                }
+
+                await _CourseRepository.UpdateCourse(_mapper.Map<Course>(courseDto));
+
+                _logger.LogInformation("Course updated: {@Course}", existingCourse);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating the course.");
+                return false;
+            }
+        }
     }
 
 }

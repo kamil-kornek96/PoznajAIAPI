@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PoznajAI.Controllers;
 using PoznajAI.Data.Models;
 using PoznajAI.Models.Auth;
 using PoznajAI.Models.User;
@@ -23,6 +24,7 @@ namespace PoznajAI.Configuration
             CreateMap<Course, CourseDto>().ReverseMap();
             CreateMap<Course, OwnedCourseDto>().ReverseMap();
             CreateMap<Course, CourseCreateDto>().ReverseMap();
+            CreateMap<Course, CourseUpdateDto>().ReverseMap();
 
 
 
