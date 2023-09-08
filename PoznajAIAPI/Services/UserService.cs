@@ -50,7 +50,7 @@ namespace PoznajAI.Services
             return await _userRepository.UsernameExists(username);
         }
 
-        public async Task CreateUser(UserDto userDto)
+        public async Task CreateUser(UserCreateDto userDto)
         {
             var user = _mapper.Map<User>(userDto);
             byte[] passwordHash, passwordSalt;
@@ -89,15 +89,22 @@ namespace PoznajAI.Services
             return true;
         }
 
-        public async Task<UserDto> GetUserByName(string username)
+        public async Task<User> GetUserByName(string username)
         {
             User user = await _userRepository.GetUserByUsername(username);
-            return _mapper.Map<UserDto>(user);
+
+            return user;
         }
 
         public async Task<bool> AddCourseToUser(Guid userId, Guid courseId)
         {
             return await _userRepository.AddCourseToUser(userId, courseId);
+        }
+
+        public async Task<UserDto> AddUserRoleAsync(Guid userId, UserRole role)
+        {
+            var user = await _userRepository.AddUserRoleAsync(userId, role);
+            return _mapper.Map<UserDto>(user);
         }
     }
 

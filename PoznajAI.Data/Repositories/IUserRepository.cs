@@ -12,5 +12,6 @@ namespace PoznajAI.Data.Repositories
         Task<User> GetUserByUsername(string username);
         Task UpdateUser(User user);
         Task<bool> UsernameExists(string username);
+        Task<User> AddUserRoleAsync(Guid userId, UserRole role);
     }
 }

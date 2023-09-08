@@ -20,7 +20,7 @@ namespace PoznajAI.Data.Repositories
 
         public async Task<User> GetUserById(Guid userId)
         {
-            return await _dbContext.Users.FindAsync(userId);
+            return _dbContext.Users.Include(u =>u.Roles).FirstOrDefault(u => u.Id == userId);
         }
 
         public async Task<User> GetUserByUsername(string username)
@@ -93,6 +93,35 @@ namespace PoznajAI.Data.Repositories
                 return false;
             }
         }
+
+        public async Task<User> AddUserRoleAsync(Guid userId, UserRole role)
+        {
+            var user = await _dbContext.Users
+                .Include(u => u.Roles)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            if (user.Roles.Any(r => r.Name == role))
+            {
+                return null; 
+            }
+
+            var roleDto = new Role
+            {
+                Name = role,
+                UserId = userId
+            };
+
+            user.Roles.Add(roleDto);
+            await _dbContext.SaveChangesAsync();
+
+            return user;
+        }
+
 
 
     }

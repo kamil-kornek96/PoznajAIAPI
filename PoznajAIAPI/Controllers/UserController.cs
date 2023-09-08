@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using PoznajAI.Data.Models;
 using PoznajAI.Models.Auth;
 using PoznajAI.Models.User;
 using PoznajAI.Services;
@@ -22,7 +23,7 @@ namespace PoznajAI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<UserDto>> Login(LoginRequestDto model)
+        public async Task<ActionResult<TokenDto>> Login(LoginRequestDto model)
         {
             var userDto = await _userService.Authenticate(model.Username, model.Password);
 
@@ -55,14 +56,14 @@ namespace PoznajAI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> Register(RegisterRequestDto model)
+        public async Task<ActionResult<TokenDto>> Register(RegisterRequestDto model)
         {
             if (await _userService.IsUsernameTaken(model.Username))
             {
                 return BadRequest(new { message = "Username is already taken" });
             }
 
-            var userDto = new UserDto
+            var userDto = new UserCreateDto
             {
                 FirstName = model.FirstName,
                 LastName = model.LastName,
@@ -130,6 +131,18 @@ namespace PoznajAI.Controllers
             {
                 return BadRequest(new { message = "Course could not be added to user" });
             }
+        }
+
+        [HttpPost("{userId}/roles")]
+        public async Task<IActionResult> AddUserRole(Guid userId, [FromBody] UserRole role)
+        {
+            var user = await _userService.AddUserRoleAsync(userId, role);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            return Ok(user);
         }
 
     }

@@ -10,7 +10,10 @@ namespace PoznajAI.Configuration
     {
         public AutoMapperProfiles()
         {
-            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<User, UserDto>().ForMember(dest => dest.IsAdmin, opt => opt.MapFrom<IsAdminResolver>());
+
+            CreateMap<User, UserCreateDto>().ReverseMap();
+
             CreateMap<RegisterRequestDto, UserDto>().ReverseMap();
             CreateMap<Role, RoleDto>().ReverseMap();
 
