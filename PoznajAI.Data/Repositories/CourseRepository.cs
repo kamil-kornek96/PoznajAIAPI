@@ -21,7 +21,7 @@ namespace PoznajAI.Data.Repositories
 
         public async Task<IEnumerable<Course>> GetAllCourses()
         {
-            return await _dbContext.Courses.ToListAsync();
+            return await _dbContext.Courses.Include(c => c.Lessons).ToListAsync();
         }
 
         public async Task CreateCourse(Course course)

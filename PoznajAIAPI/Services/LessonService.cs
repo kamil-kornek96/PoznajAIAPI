@@ -34,6 +34,12 @@ namespace PoznajAI.Services
             _logger.LogInformation("Lesson created: {@Lesson}", lesson);
         }
 
+        public async Task UpdateLesson(UpdateLessonDto lessonDto)
+        {
+            var lesson = _mapper.Map<Lesson>(lessonDto);
+            await _LessonRepository.UpdateLesson(lesson);
+            _logger.LogInformation("Lesson updated: {@Lesson}", lesson);
+        }
     }
 
 }
