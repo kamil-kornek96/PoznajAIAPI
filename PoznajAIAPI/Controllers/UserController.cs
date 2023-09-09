@@ -5,6 +5,9 @@ using PoznajAI.Data.Models;
 using PoznajAI.Models.Auth;
 using PoznajAI.Models.User;
 using PoznajAI.Services;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PoznajAI.Controllers
 {
@@ -72,18 +75,31 @@ namespace PoznajAI.Controllers
                 Password = model.Password
             };
 
-            await _userService.CreateUser(userDto);
-
-            var addeUserDto = await _userService.Authenticate(model.Username, model.Password);
-
-            if (addeUserDto == null)
+            try
             {
-                return BadRequest(new { message = "Username or password is incorrect" });
+                var userId = await _userService.CreateUser(userDto);
+
+                if (userId == Guid.Empty)
+                {
+                    return BadRequest(new { message = "Failed to create user" });
+                }
+
+                var addedUserDto = await _userService.Authenticate(model.Username, model.Password);
+
+                if (addedUserDto == null)
+                {
+                    return BadRequest(new { message = "Username or password is incorrect" });
+                }
+
+                var token = _jwtService.GenerateToken(addedUserDto);
+
+                return Ok(token);
             }
-
-            var token = _jwtService.GenerateToken(addeUserDto);
-
-            return Ok(token);
+            catch (Exception ex)
+            {
+                // Log the error
+                return StatusCode(500, new { message = "An error occurred while registering the user" });
+            }
         }
 
         [Authorize]
@@ -97,7 +113,7 @@ namespace PoznajAI.Controllers
                 return Unauthorized(new { message = "Token is missing" });
             }
 
-            var userDto = _jwtService.ValidateToken(token);
+            var userDto = await _jwtService.ValidateToken(token);
 
             if (userDto == null)
             {
@@ -115,7 +131,6 @@ namespace PoznajAI.Controllers
         [HttpPost("add-course")]
         public async Task<ActionResult> AddCourseToUser([FromBody] CourseAssignmentDto assignment)
         {
-            // Check if the assignment model is valid
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -144,6 +159,5 @@ namespace PoznajAI.Controllers
 
             return Ok(user);
         }
-
     }
 }

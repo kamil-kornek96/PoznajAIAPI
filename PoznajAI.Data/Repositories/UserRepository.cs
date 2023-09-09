@@ -1,6 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PoznajAI.Data.Data;
 using PoznajAI.Data.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PoznajAI.Data.Repositories
 {
@@ -20,7 +24,7 @@ namespace PoznajAI.Data.Repositories
 
         public async Task<User> GetUserById(Guid userId)
         {
-            return _dbContext.Users.Include(u =>u.Roles).FirstOrDefault(u => u.Id == userId);
+            return await _dbContext.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         public async Task<User> GetUserByUsername(string username)
@@ -28,22 +32,22 @@ namespace PoznajAI.Data.Repositories
             return await _dbContext.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Username == username);
         }
 
-        public async Task CreateUser(User user, UserRole role)
+        public async Task<Guid> CreateUser(User user, UserRole role)
         {
             try
             {
-                // Utwórz użytkownika bez przypisanej roli
                 await _dbContext.Users.AddAsync(user);
                 await _dbContext.SaveChangesAsync();
 
-                // Utwórz nową rolę i przypisz ją do użytkownika
                 var newRole = new Role { Name = role, UserId = user.Id };
                 _dbContext.Roles.Add(newRole);
                 await _dbContext.SaveChangesAsync();
+
+                return user.Id;
             }
             catch (Exception ex)
             {
-                var errorMessage = ex.Message;
+                throw new Exception("An error occurred while creating the user.", ex);
             }
         }
 
@@ -53,14 +57,16 @@ namespace PoznajAI.Data.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteUser(Guid userId)
+        public async Task<bool> DeleteUser(Guid userId)
         {
             var user = await _dbContext.Users.FindAsync(userId);
             if (user != null)
             {
                 _dbContext.Users.Remove(user);
                 await _dbContext.SaveChangesAsync();
+                return true;
             }
+            return false;
         }
 
         public async Task<bool> UsernameExists(string username)
@@ -73,8 +79,8 @@ namespace PoznajAI.Data.Repositories
             try
             {
                 var user = await _dbContext.Users
-                    .Include(u => u.Courses) // Include the Courses collection
-                    .FirstOrDefaultAsync(u => u.Id == userId); // Assuming 'Id' is the user's primary key
+                    .Include(u => u.Courses)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
 
                 var course = await _dbContext.Courses.FindAsync(courseId);
 
@@ -89,8 +95,7 @@ namespace PoznajAI.Data.Repositories
             }
             catch (Exception ex)
             {
-                // Handle exceptions here
-                return false;
+                throw new Exception("An error occurred while adding a course to the user.", ex);
             }
         }
 
@@ -107,7 +112,7 @@ namespace PoznajAI.Data.Repositories
 
             if (user.Roles.Any(r => r.Name == role))
             {
-                return null; 
+                return null;
             }
 
             var roleDto = new Role
@@ -121,8 +126,5 @@ namespace PoznajAI.Data.Repositories
 
             return user;
         }
-
-
-
     }
 }

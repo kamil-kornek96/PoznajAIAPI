@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PoznajAI.Data.Data;
 using PoznajAI.Data.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace PoznajAI.Data.Repositories
 {
@@ -18,34 +20,37 @@ namespace PoznajAI.Data.Repositories
             return await _dbContext.Lessons.FindAsync(lessonId);
         }
 
-        public async Task CreateLesson(Lesson lesson)
+        public async Task<Lesson> CreateLesson(Lesson lesson)
         {
             try
             {
-                await _dbContext.Lessons.AddAsync(lesson);
+                _dbContext.Lessons.Add(lesson);
                 await _dbContext.SaveChangesAsync();
-
+                return lesson;
             }
             catch (Exception ex)
             {
-                var errorMessage = ex.Message;
+                throw new Exception("Nie udało się utworzyć lekcji.", ex);
             }
         }
 
-        public async Task UpdateLesson(Lesson lesson)
+        public async Task<Lesson> UpdateLesson(Lesson lesson)
         {
-            _dbContext.Lessons.Update(lesson);
+            _dbContext.Entry(lesson).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
+            return lesson;
         }
 
-        public async Task DeleteLesson(Guid lessonId)
+        public async Task<bool> DeleteLesson(Guid lessonId)
         {
             var lesson = await _dbContext.Lessons.FindAsync(lessonId);
             if (lesson != null)
             {
                 _dbContext.Lessons.Remove(lesson);
                 await _dbContext.SaveChangesAsync();
+                return true;
             }
+            return false;
         }
     }
 }

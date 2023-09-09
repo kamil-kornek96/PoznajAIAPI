@@ -1,6 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PoznajAI.Data.Data;
 using PoznajAI.Data.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PoznajAI.Data.Repositories
 {
@@ -15,8 +19,13 @@ namespace PoznajAI.Data.Repositories
 
         public async Task<IEnumerable<Course>> GetAllCoursesForUser(Guid userId)
         {
-            var user = _dbContext.Users.Find(userId);
-            return _dbContext.Courses.Include(c => c.Lessons).Where(c => c.Users.Contains(user));
+            var user = await _dbContext.Users.FindAsync(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found.");
+            }
+
+            return _dbContext.Courses.Include(c => c.Lessons).Where(c => c.Users.Contains(user)).ToList();
         }
 
         public async Task<IEnumerable<Course>> GetAllCourses()
@@ -24,17 +33,18 @@ namespace PoznajAI.Data.Repositories
             return await _dbContext.Courses.Include(c => c.Lessons).ToListAsync();
         }
 
-        public async Task CreateCourse(Course course)
+        public async Task<Guid> CreateCourse(Course course)
         {
             try
             {
                 await _dbContext.Courses.AddAsync(course);
                 await _dbContext.SaveChangesAsync();
-
+                return course.Id;
             }
             catch (Exception ex)
             {
-                var errorMessage = ex.Message;
+                // Obsługa błędów, np. zapis do logów
+                throw new Exception("An error occurred while creating the course.", ex);
             }
         }
 
@@ -51,19 +61,21 @@ namespace PoznajAI.Data.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteCourse(Guid courseId)
+        public async Task<bool> DeleteCourse(Guid courseId)
         {
-            var Course = await _dbContext.Courses.FindAsync(courseId);
-            if (Course != null)
+            var course = await _dbContext.Courses.FindAsync(courseId);
+            if (course != null)
             {
-                _dbContext.Courses.Remove(Course);
+                _dbContext.Courses.Remove(course);
                 await _dbContext.SaveChangesAsync();
+                return true;
             }
+            return false;
         }
 
         public async Task<Course> GetCourseById(Guid courseId)
         {
-            return _dbContext.Courses.FirstOrDefault(c => c.Id == courseId);
+            return await _dbContext.Courses.Include(c => c.Lessons).FirstOrDefaultAsync(c => c.Id == courseId);
         }
     }
 }

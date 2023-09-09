@@ -4,9 +4,9 @@ namespace PoznajAI.Data.Repositories
 {
     public interface ILessonRepository
     {
-        Task CreateLesson(Lesson lesson);
-        Task DeleteLesson(Guid lessonId);
+        Task<Lesson> CreateLesson(Lesson lesson);
+        Task<bool> DeleteLesson(Guid lessonId);
         Task<Lesson> GetLessonById(Guid lessonId);
-        Task UpdateLesson(Lesson lesson);
+        Task<Lesson> UpdateLesson(Lesson lesson);
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using PoznajAI.Services;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PoznajAI.Controllers
@@ -41,27 +41,26 @@ namespace PoznajAI.Controllers
             }
             catch (Exception ex)
             {
-                // Handle exceptions here (e.g., log the error).
+                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
                 return StatusCode(500, new { message = "An error occurred while fetching courses." });
             }
         }
 
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<ActionResult> CreateCourse(CourseCreateDto courseDto)
         {
             try
             {
-                await _courseService.CreateCourse(courseDto);
-                return Ok(new { message = "Course created successfully." });
+                var courseId = await _courseService.CreateCourse(courseDto);
+                return CreatedAtAction(nameof(GetCourseById), new { id = courseId }, new { message = "Course created successfully." });
             }
             catch (Exception ex)
             {
-                // Handle exceptions here (e.g., log the error).
+                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
                 return StatusCode(500, new { message = "An error occurred while creating the course." });
             }
         }
 
-        // Get a course by its ID
         [HttpGet("{id}")]
         public async Task<ActionResult<CourseDto>> GetCourseById(Guid id)
         {
@@ -78,31 +77,29 @@ namespace PoznajAI.Controllers
             }
             catch (Exception ex)
             {
-                // Handle exceptions here (e.g., log the error).
+                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
                 return StatusCode(500, new { message = "An error occurred while fetching the course." });
             }
         }
 
-        // Update an existing course
-        [Authorize] // Add authorization if required
-        [HttpPut("update/{id}")]
+        [Authorize]
+        [HttpPut("{id}")]
         public async Task<ActionResult> UpdateCourse(Guid id, CourseUpdateDto courseDto)
         {
             try
             {
-                var existingCourse = await _courseService.GetCourseById(id);
+                var success = await _courseService.UpdateCourse(id, courseDto);
 
-                if (existingCourse == null)
+                if (!success)
                 {
                     return NotFound(new { message = "Course not found." });
                 }
 
-                await _courseService.UpdateCourse(id, courseDto);
-                return Ok(new { message = "Course updated successfully." });
+                return NoContent();
             }
             catch (Exception ex)
             {
-                // Handle exceptions here (e.g., log the error).
+                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
                 return StatusCode(500, new { message = "An error occurred while updating the course." });
             }
         }

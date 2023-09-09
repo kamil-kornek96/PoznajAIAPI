@@ -4,7 +4,7 @@ namespace PoznajAI.Services
 {
     public interface ICourseService
     {
-        Task CreateCourse(CourseCreateDto CourseDto);
+        Task<Guid> CreateCourse(CourseCreateDto courseDto);
         Task<UserCoursesResponseDto> GetAllCoursesForUser(Guid userId);
         Task<CourseDto> GetCourseById(Guid id);
         Task<bool> UpdateCourse(Guid id, CourseUpdateDto courseDto);

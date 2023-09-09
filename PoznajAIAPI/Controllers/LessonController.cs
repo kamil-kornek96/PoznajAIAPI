@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PoznajAI.Services;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PoznajAI.Controllers
@@ -18,7 +17,7 @@ namespace PoznajAI.Controllers
         public LessonController(ILessonService lessonService, ICourseService courseService)
         {
             _lessonService = lessonService;
-            _courseService = courseService; 
+            _courseService = courseService;
         }
 
         [HttpGet("{id}")]
@@ -27,47 +26,67 @@ namespace PoznajAI.Controllers
             try
             {
                 var lesson = await _lessonService.GetLessonById(id);
+
+                if (lesson == null)
+                {
+                    return NotFound(new { message = "Lesson not found." });
+                }
+
                 return Ok(lesson);
             }
             catch (Exception ex)
             {
-                // Handle exceptions here (e.g., log the error).
-                return StatusCode(500, new { message = "An error occurred while fetching lessons." });
+                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
+                return StatusCode(500, new { message = "An error occurred while fetching the lesson." });
             }
         }
 
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<ActionResult> CreateLesson(CreateLessonDto lessonDto)
         {
             try
             {
                 var course = await _courseService.GetCourseById(lessonDto.CourseId);
-                if(course == null)
+
+                if (course == null)
                 {
                     return NotFound(new { message = "Course not found." });
                 }
-                await _lessonService.CreateLesson(lessonDto);
-                return Ok(new { message = "Lesson created successfully." });
+
+                var createdLessonId = await _lessonService.CreateLesson(lessonDto);
+
+                // Zamiast "Lesson created successfully.", możesz zwracać status HTTP 201 (Created) z nagłówkiem "Location" zawierającym URL do nowo utworzonej lekcji.
+                return CreatedAtAction(nameof(GetLessonById), new { id = createdLessonId }, new { message = "Lesson created successfully." });
             }
             catch (Exception ex)
             {
-                // Handle exceptions here (e.g., log the error).
+                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
                 return StatusCode(500, new { message = "An error occurred while creating the lesson." });
             }
         }
 
-        [HttpPut]
-        public async Task<ActionResult> UpdateLesson(UpdateLessonDto lessonDto)
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateLesson(Guid id, UpdateLessonDto lessonDto)
         {
             try
             {
+                var existingLesson = await _lessonService.GetLessonById(id);
+
+                if (existingLesson == null)
+                {
+                    return NotFound(new { message = "Lesson not found." });
+                }
+
+                lessonDto.Id = id;
                 await _lessonService.UpdateLesson(lessonDto);
-                return Ok(new { message = "Lesson created successfully." });
+
+                // Zamiast "Lesson created successfully.", możesz zwracać status HTTP 204 (No Content) lub inny odpowiedni status.
+                return NoContent();
             }
             catch (Exception ex)
             {
-                // Handle exceptions here (e.g., log the error).
-                return StatusCode(500, new { message = "An error occurred while creating the lesson." });
+                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
+                return StatusCode(500, new { message = "An error occurred while updating the lesson." });
             }
         }
     }

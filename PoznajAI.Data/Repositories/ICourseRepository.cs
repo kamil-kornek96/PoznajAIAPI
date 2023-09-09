@@ -4,11 +4,11 @@ namespace PoznajAI.Data.Repositories
 {
     public interface ICourseRepository
     {
-        Task CreateCourse(Course Course);
-        Task DeleteCourse(Guid courseId);
-        Task<IEnumerable<Course>> GetAllCoursesForUser(Guid userId);
+        Task<Guid> CreateCourse(Course course);
+        Task<bool> DeleteCourse(Guid courseId);
         Task<IEnumerable<Course>> GetAllCourses();
-        Task UpdateCourse(Course Course);
-        Task<Course> GetCourseById(Guid id);
+        Task<IEnumerable<Course>> GetAllCoursesForUser(Guid userId);
+        Task<Course> GetCourseById(Guid courseId);
+        Task UpdateCourse(Course updatedCourse);
     }
 }

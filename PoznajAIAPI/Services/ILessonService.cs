@@ -2,8 +2,9 @@
 {
     public interface ILessonService
     {
-        Task CreateLesson(CreateLessonDto lessonDto);
+        Task<Guid> CreateLesson(CreateLessonDto lessonDto);
+        Task<bool> DeleteLesson(Guid lessonId);
+        Task<LessonDetailsDto> GetLessonById(Guid lessonId);
         Task UpdateLesson(UpdateLessonDto lessonDto);
-        Task<LessonDto> GetLessonById(Guid lessonId);
     }
 }

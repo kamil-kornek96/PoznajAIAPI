@@ -1,13 +1,16 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
 using PoznajAI.Models.User;
+using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace PoznajAI.Services
 {
-
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
@@ -50,7 +53,7 @@ namespace PoznajAI.Services
             return await _userRepository.UsernameExists(username);
         }
 
-        public async Task CreateUser(UserCreateDto userDto)
+        public async Task<Guid> CreateUser(UserCreateDto userDto)
         {
             var user = _mapper.Map<User>(userDto);
             byte[] passwordHash, passwordSalt;
@@ -59,8 +62,17 @@ namespace PoznajAI.Services
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            await _userRepository.CreateUser(user, UserRole.User);
-            _logger.LogInformation("User created: {@user}", user);
+            try
+            {
+                var userId = await _userRepository.CreateUser(user, UserRole.User);
+                _logger.LogInformation("User created: {@user}", user);
+                return userId;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the user.");
+                throw;
+            }
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
@@ -69,7 +81,6 @@ namespace PoznajAI.Services
 
             passwordSalt = hmac.Key;
             passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-
         }
 
         private bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
@@ -92,20 +103,34 @@ namespace PoznajAI.Services
         public async Task<User> GetUserByName(string username)
         {
             User user = await _userRepository.GetUserByUsername(username);
-
             return user;
         }
 
         public async Task<bool> AddCourseToUser(Guid userId, Guid courseId)
         {
-            return await _userRepository.AddCourseToUser(userId, courseId);
+            try
+            {
+                return await _userRepository.AddCourseToUser(userId, courseId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while adding a course to the user.");
+                throw;
+            }
         }
 
         public async Task<UserDto> AddUserRoleAsync(Guid userId, UserRole role)
         {
-            var user = await _userRepository.AddUserRoleAsync(userId, role);
-            return _mapper.Map<UserDto>(user);
+            try
+            {
+                var user = await _userRepository.AddUserRoleAsync(userId, role);
+                return _mapper.Map<UserDto>(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while adding a role to the user.");
+                throw;
+            }
         }
     }
-
 }

@@ -1,23 +1,24 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using PoznajAI.Controllers;
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
-using System.Security.Cryptography;
-using System.Text;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PoznajAI.Services
 {
-
     public class CourseService : ICourseService
     {
-        private readonly ICourseRepository _CourseRepository;
+        private readonly ICourseRepository _courseRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<CourseService> _logger;
 
-        public CourseService(ICourseRepository CourseRepository, IMapper mapper, ILogger<CourseService> logger)
+        public CourseService(ICourseRepository courseRepository, IMapper mapper, ILogger<CourseService> logger)
         {
-            _CourseRepository = CourseRepository;
+            _courseRepository = courseRepository;
             _mapper = mapper;
             _logger = logger;
         }
@@ -26,11 +27,10 @@ namespace PoznajAI.Services
         {
             try
             {
-                var ownedCourses = await _CourseRepository.GetAllCoursesForUser(userId);
-                var allCourses = await _CourseRepository.GetAllCourses();
+                var ownedCourses = await _courseRepository.GetAllCoursesForUser(userId);
+                var allCourses = await _courseRepository.GetAllCourses();
 
-
-                var availableCourses = allCourses.Where(course => !ownedCourses.Any(ownedCourse => ownedCourse.Id == course.Id)).ToList();
+                var availableCourses = allCourses.Except(ownedCourses).ToList();
 
                 var responseDto = new UserCoursesResponseDto
                 {
@@ -42,26 +42,34 @@ namespace PoznajAI.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Wystąpił błąd podczas pobierania kursów dla użytkownika.");
+                _logger.LogError(ex, "An error occurred while fetching courses for the user.");
                 throw;
             }
         }
 
-
-
-
-        public async Task CreateCourse(CourseCreateDto CourseDto)
+        public async Task<Guid> CreateCourse(CourseCreateDto courseDto)
         {
-            var Course = _mapper.Map<Course>(CourseDto);
-            await _CourseRepository.CreateCourse(Course);
-            _logger.LogInformation("Course created: {@Course}", Course);
+            try
+            {
+                var course = _mapper.Map<Course>(courseDto);
+                var createdCourseId = await _courseRepository.CreateCourse(course);
+
+                _logger.LogInformation("Course created: {@Course}", course);
+
+                return createdCourseId;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the course.");
+                throw;
+            }
         }
 
         public async Task<CourseDto> GetCourseById(Guid id)
         {
             try
             {
-                var course = await _CourseRepository.GetCourseById(id);
+                var course = await _courseRepository.GetCourseById(id);
 
                 if (course == null)
                 {
@@ -74,7 +82,7 @@ namespace PoznajAI.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while fetching the course by ID.");
-                return null;
+                throw;
             }
         }
 
@@ -82,14 +90,15 @@ namespace PoznajAI.Services
         {
             try
             {
-                var existingCourse = await _CourseRepository.GetCourseById(id);
+                var existingCourse = await _courseRepository.GetCourseById(id);
 
                 if (existingCourse == null)
                 {
                     return false;
                 }
 
-                await _CourseRepository.UpdateCourse(_mapper.Map<Course>(courseDto));
+                courseDto.Id = id;
+                await _courseRepository.UpdateCourse(_mapper.Map<Course>(courseDto));
 
                 _logger.LogInformation("Course updated: {@Course}", existingCourse);
                 return true;
@@ -97,9 +106,8 @@ namespace PoznajAI.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating the course.");
-                return false;
+                throw;
             }
         }
     }
-
 }
