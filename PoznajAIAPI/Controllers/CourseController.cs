@@ -41,7 +41,6 @@ namespace PoznajAI.Controllers
             }
             catch (Exception ex)
             {
-                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
                 return StatusCode(500, new { message = "An error occurred while fetching courses." });
             }
         }
@@ -56,7 +55,6 @@ namespace PoznajAI.Controllers
             }
             catch (Exception ex)
             {
-                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
                 return StatusCode(500, new { message = "An error occurred while creating the course." });
             }
         }
@@ -77,7 +75,6 @@ namespace PoznajAI.Controllers
             }
             catch (Exception ex)
             {
-                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
                 return StatusCode(500, new { message = "An error occurred while fetching the course." });
             }
         }
@@ -99,9 +96,30 @@ namespace PoznajAI.Controllers
             }
             catch (Exception ex)
             {
-                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
                 return StatusCode(500, new { message = "An error occurred while updating the course." });
             }
         }
+
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteCourse(Guid id)
+        {
+            try
+            {
+                var success = await _courseService.DeleteCourse(id);
+
+                if (!success)
+                {
+                    return NotFound(new { message = "Course not found." });
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting the course." });
+            }
+        }
+
     }
 }

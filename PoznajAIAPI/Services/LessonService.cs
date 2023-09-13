@@ -4,6 +4,7 @@ using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
 using PoznajAI.Exceptions;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PoznajAI.Services
@@ -23,54 +24,88 @@ namespace PoznajAI.Services
 
         public async Task<LessonDetailsDto> GetLessonById(Guid lessonId)
         {
-            var lesson = await _lessonRepository.GetLessonById(lessonId);
-
-            if (lesson == null)
+            try
             {
-                throw new NotFoundException($"Lesson with ID {lessonId} not found.");
-            }
+                var lesson = await _lessonRepository.GetLessonById(lessonId);
 
-            return _mapper.Map<LessonDetailsDto>(lesson);
+                if (lesson == null)
+                {
+                    throw new NotFoundException($"Lesson with ID {lessonId} not found.");
+                }
+
+                return _mapper.Map<LessonDetailsDto>(lesson);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching the lesson by ID.");
+                throw;
+            }
         }
 
         public async Task<Guid> CreateLesson(CreateLessonDto lessonDto)
         {
-            var lesson = _mapper.Map<Lesson>(lessonDto);
-            var createdLesson = await _lessonRepository.CreateLesson(lesson);
+            try
+            {
+                var lesson = _mapper.Map<Lesson>(lessonDto);
+                var createdLesson = await _lessonRepository.CreateLesson(lesson);
 
-            _logger.LogInformation("Lesson created: {@Lesson}", createdLesson);
+                _logger.LogInformation("Lesson created: {@Lesson}", createdLesson);
 
-            return createdLesson.Id;
+                return createdLesson.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the lesson.");
+                throw;
+            }
         }
 
-        public async Task UpdateLesson(UpdateLessonDto lessonDto)
+        public async Task<bool> UpdateLesson(Guid lessonId, UpdateLessonDto lessonDto)
         {
-            var lesson = await _lessonRepository.GetLessonById(lessonDto.Id);
-
-            if (lesson == null)
+            try
             {
-                // Obsługa błędu: Lekcja o podanym ID nie została znaleziona.
-                throw new NotFoundException($"Lesson with ID {lessonDto.Id} not found.");
+                var existingLesson = await _lessonRepository.GetLessonById(lessonId);
+
+                if (existingLesson == null)
+                {
+                    return false;
+                }
+
+                _mapper.Map(lessonDto, existingLesson);
+
+                await _lessonRepository.UpdateLesson(existingLesson);
+
+                _logger.LogInformation("Lesson updated: {@Lesson}", existingLesson);
+                return true;
             }
-
-            _mapper.Map(lessonDto, lesson);
-
-            await _lessonRepository.UpdateLesson(lesson);
-
-            _logger.LogInformation("Lesson updated: {@Lesson}", lesson);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating the lesson.");
+                throw;
+            }
         }
 
         public async Task<bool> DeleteLesson(Guid lessonId)
         {
-            var lesson = await _lessonRepository.GetLessonById(lessonId);
-
-            if (lesson == null)
+            try
             {
-                // Obsługa błędu: Lekcja o podanym ID nie została znaleziona.
-                throw new NotFoundException($"Lesson with ID {lessonId} not found.");
-            }
+                var existingLesson = await _lessonRepository.GetLessonById(lessonId);
 
-            return await _lessonRepository.DeleteLesson(lessonId);
+                if (existingLesson == null)
+                {
+                    return false;
+                }
+
+                var result = await _lessonRepository.DeleteLesson(lessonId);
+
+                _logger.LogInformation("Lesson deleted: {@Lesson}", existingLesson);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting the lesson.");
+                throw;
+            }
         }
     }
 }

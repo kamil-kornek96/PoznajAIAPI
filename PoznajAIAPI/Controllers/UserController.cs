@@ -97,7 +97,6 @@ namespace PoznajAI.Controllers
             }
             catch (Exception ex)
             {
-                // Log the error
                 return StatusCode(500, new { message = "An error occurred while registering the user" });
             }
         }

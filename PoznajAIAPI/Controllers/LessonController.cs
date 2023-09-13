@@ -36,11 +36,9 @@ namespace PoznajAI.Controllers
             }
             catch (Exception ex)
             {
-                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
                 return StatusCode(500, new { message = "An error occurred while fetching the lesson." });
             }
         }
-
         [HttpPost]
         public async Task<ActionResult> CreateLesson(CreateLessonDto lessonDto)
         {
@@ -55,12 +53,10 @@ namespace PoznajAI.Controllers
 
                 var createdLessonId = await _lessonService.CreateLesson(lessonDto);
 
-                // Zamiast "Lesson created successfully.", możesz zwracać status HTTP 201 (Created) z nagłówkiem "Location" zawierającym URL do nowo utworzonej lekcji.
                 return CreatedAtAction(nameof(GetLessonById), new { id = createdLessonId }, new { message = "Lesson created successfully." });
             }
             catch (Exception ex)
             {
-                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
                 return StatusCode(500, new { message = "An error occurred while creating the lesson." });
             }
         }
@@ -78,16 +74,35 @@ namespace PoznajAI.Controllers
                 }
 
                 lessonDto.Id = id;
-                await _lessonService.UpdateLesson(lessonDto);
+                await _lessonService.UpdateLesson(id,lessonDto);
 
-                // Zamiast "Lesson created successfully.", możesz zwracać status HTTP 204 (No Content) lub inny odpowiedni status.
                 return NoContent();
             }
             catch (Exception ex)
             {
-                // Obsługa błędów: zaloguj błąd lub zwróć bardziej odpowiedni kod błędu HTTP.
                 return StatusCode(500, new { message = "An error occurred while updating the lesson." });
             }
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteLesson(Guid id)
+        {
+            try
+            {
+                var success = await _lessonService.DeleteLesson(id);
+
+                if (!success)
+                {
+                    return NotFound(new { message = "Lesson not found." });
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting the lesson." });
+            }
+        }
+
     }
 }

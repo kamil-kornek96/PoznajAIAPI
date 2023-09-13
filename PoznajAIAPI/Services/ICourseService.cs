@@ -8,5 +8,6 @@ namespace PoznajAI.Services
         Task<UserCoursesResponseDto> GetAllCoursesForUser(Guid userId);
         Task<CourseDto> GetCourseById(Guid id);
         Task<bool> UpdateCourse(Guid id, CourseUpdateDto courseDto);
+        Task<bool> DeleteCourse(Guid id);
     }
 }

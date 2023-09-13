@@ -109,5 +109,29 @@ namespace PoznajAI.Services
                 throw;
             }
         }
+
+        public async Task<bool> DeleteCourse(Guid id)
+        {
+            try
+            {
+                var existingCourse = await _courseRepository.GetCourseById(id);
+
+                if (existingCourse == null)
+                {
+                    return false;
+                }
+
+                await _courseRepository.DeleteCourse(id);
+
+                _logger.LogInformation("Course deleted: {@Course}", existingCourse);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting the course.");
+                throw;
+            }
+        }
+
     }
 }
