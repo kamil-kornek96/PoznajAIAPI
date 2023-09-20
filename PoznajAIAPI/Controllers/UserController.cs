@@ -26,18 +26,18 @@ namespace PoznajAI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<TokenDto>> Login(LoginRequestDto model)
+        public async Task<ActionResult<string>> Login(LoginRequestDto model)
         {
             var userDto = await _userService.Authenticate(model.Username, model.Password);
 
             if (userDto == null)
             {
-                return BadRequest(new { message = "Username or password is incorrect" });
+                return BadRequest(new { message = "Nazwa użytkownika lub hasło są nieprawidłowe." });
             }
 
             var token = _jwtService.GenerateToken(userDto);
 
-            return Ok(token);
+            return Ok(new {message="Pomyślnie zalogowano!", token });
         }
 
         [HttpGet]
@@ -59,11 +59,11 @@ namespace PoznajAI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<TokenDto>> Register(RegisterRequestDto model)
+        public async Task<ActionResult<string>> Register(RegisterRequestDto model)
         {
             if (await _userService.IsUsernameTaken(model.Username))
             {
-                return BadRequest(new { message = "Username is already taken" });
+                return BadRequest(new { message = "Nazwa użytkownika jest zajęta." });
             }
 
             var userDto = new UserCreateDto
@@ -81,23 +81,27 @@ namespace PoznajAI.Controllers
 
                 if (userId == Guid.Empty)
                 {
-                    return BadRequest(new { message = "Failed to create user" });
+                    return BadRequest(new { message = "Podczas rejestracji użytkownika, wystąpił błąd." });
                 }
 
                 var addedUserDto = await _userService.Authenticate(model.Username, model.Password);
 
                 if (addedUserDto == null)
                 {
-                    return BadRequest(new { message = "Username or password is incorrect" });
+                    return BadRequest(new { message = "Nazwa użytkownika lub hasło są nieprawidłowe." });
                 }
 
                 var token = _jwtService.GenerateToken(addedUserDto);
 
-                return Ok(token);
+                return Ok(new
+                {
+                    message = "",
+                    token
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while registering the user" });
+                return StatusCode(500, new { message = "Podczas rejestracji użytkownika, wystąpił błąd." });
             }
         }
 
@@ -109,19 +113,19 @@ namespace PoznajAI.Controllers
 
             if (string.IsNullOrEmpty(token))
             {
-                return Unauthorized(new { message = "Token is missing" });
+                return Unauthorized(new { message = "Brak tokena" });
             }
 
             var userDto = await _jwtService.ValidateToken(token);
 
             if (userDto == null)
             {
-                return Unauthorized(new { message = "Invalid token" });
+                return Unauthorized(new { message = "Niepoprawny token" });
             }
 
             return Ok(new
             {
-                message = "User is authenticated",
+                message = "Użytkownik zautoryzowany",
                 user = userDto
             });
         }
@@ -156,7 +160,7 @@ namespace PoznajAI.Controllers
                 return NotFound(new { message = "User not found" });
             }
 
-            return Ok(user);
+            return Ok(new { message = "",user });
         }
     }
 }

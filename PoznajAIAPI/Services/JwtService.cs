@@ -22,7 +22,7 @@ public class JwtService : IJwtService
         _audience = config["JwtSettings:Audicence"];
     }
 
-    public TokenDto GenerateToken(UserDto userDto)
+    public string GenerateToken(UserDto userDto)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_secretKey);
@@ -42,7 +42,7 @@ public class JwtService : IJwtService
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        return new TokenDto { Token = tokenHandler.WriteToken(token) };
+        return tokenHandler.WriteToken(token);
     }
 
     public async Task<UserDto> ValidateToken(string token)

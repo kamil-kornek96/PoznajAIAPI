@@ -4,7 +4,7 @@ namespace PoznajAI.Services
 {
     public interface IJwtService
     {
-        TokenDto GenerateToken(UserDto userDto);
+        string GenerateToken(UserDto userDto);
         Task<UserDto> ValidateToken(string token);
     }
 }

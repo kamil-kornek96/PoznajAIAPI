@@ -29,14 +29,14 @@ namespace PoznajAI.Controllers
 
                 if (lesson == null)
                 {
-                    return NotFound(new { message = "Lesson not found." });
+                    return NotFound(new { message = "Nie znaleziono lekcji." });
                 }
 
                 return Ok(lesson);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while fetching the lesson." });
+                return StatusCode(500, new { message = "Problem z pobraniem danych lekcji." });
             }
         }
         [HttpPost]
@@ -48,16 +48,16 @@ namespace PoznajAI.Controllers
 
                 if (course == null)
                 {
-                    return NotFound(new { message = "Course not found." });
+                    return NotFound(new { message = "Nie znaleziono kursu do którego miałaby być dodana lekcja." });
                 }
 
                 var createdLessonId = await _lessonService.CreateLesson(lessonDto);
 
-                return CreatedAtAction(nameof(GetLessonById), new { id = createdLessonId }, new { message = "Lesson created successfully." });
+                return CreatedAtAction(nameof(GetLessonById), new { id = createdLessonId }, new { message = "Dodano lekcje." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while creating the lesson." });
+                return StatusCode(500, new { message = "Problem z dodaniem lekcji." });
             }
         }
 
@@ -70,17 +70,17 @@ namespace PoznajAI.Controllers
 
                 if (existingLesson == null)
                 {
-                    return NotFound(new { message = "Lesson not found." });
+                    return NotFound(new { message = "Nie znaleziono lekcji do aktualizacji." });
                 }
 
                 lessonDto.Id = id;
                 await _lessonService.UpdateLesson(id,lessonDto);
 
-                return NoContent();
+                return Ok(new { message = "Zaktualizowano lekcje." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while updating the lesson." });
+                return StatusCode(500, new { message = "Problem z aktualizacją lekcji." });
             }
         }
 
@@ -93,14 +93,14 @@ namespace PoznajAI.Controllers
 
                 if (!success)
                 {
-                    return NotFound(new { message = "Lesson not found." });
+                    return NotFound(new { message = "Nie znaleziono lekcji do usunięcia." });
                 }
 
-                return NoContent();
+                return Ok(new { message = "Usunięto lekcje." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while deleting the lesson." });
+                return StatusCode(500, new { message = "Problem z usunięciem lekcji." });
             }
         }
 

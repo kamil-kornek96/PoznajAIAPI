@@ -32,7 +32,7 @@ namespace PoznajAI.Controllers
 
                 if (string.IsNullOrEmpty(token))
                 {
-                    return Unauthorized(new { message = "Token is missing" });
+                    return Unauthorized(new { message = "Użytkownik niezautoryzowany" });
                 }
 
                 var userDto = await _jwtService.ValidateToken(token);
@@ -41,7 +41,7 @@ namespace PoznajAI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while fetching courses." });
+                return StatusCode(500, new { message = "Problem z pobraniem kursów." });
             }
         }
 
@@ -51,11 +51,11 @@ namespace PoznajAI.Controllers
             try
             {
                 var courseId = await _courseService.CreateCourse(courseDto);
-                return CreatedAtAction(nameof(GetCourseById), new { id = courseId }, new { message = "Course created successfully." });
+                return CreatedAtAction(nameof(GetCourseById), new { id = courseId }, new { message = "Dodano kurs." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while creating the course." });
+                return StatusCode(500, new { message = "Problem z dodaniem kursu." });
             }
         }
 
@@ -68,14 +68,14 @@ namespace PoznajAI.Controllers
 
                 if (course == null)
                 {
-                    return NotFound(new { message = "Course not found." });
+                    return NotFound(new { message = "Nie znaleziono kursu." });
                 }
 
                 return Ok(course);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while fetching the course." });
+                return StatusCode(500, new { message = "Problem z pobraniem kursu." });
             }
         }
 
@@ -89,14 +89,14 @@ namespace PoznajAI.Controllers
 
                 if (!success)
                 {
-                    return NotFound(new { message = "Course not found." });
+                    return NotFound(new { message = "Nie znaleziono kursu do aktualizacji." });
                 }
 
-                return NoContent();
+                return Ok(new { message = "Zaktualizowano kurs." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while updating the course." });
+                return StatusCode(500, new { message = "Problem z aktualizacją kursu." });
             }
         }
 
@@ -110,14 +110,14 @@ namespace PoznajAI.Controllers
 
                 if (!success)
                 {
-                    return NotFound(new { message = "Course not found." });
+                    return NotFound(new { message = "Nie znaleziono kursu do usunięcia." });
                 }
 
-                return NoContent();
+                return Ok(new { message = "Usunięto kurs." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while deleting the course." });
+                return StatusCode(500, new { message = "Problem z usunięciem kursu." });
             }
         }
 
