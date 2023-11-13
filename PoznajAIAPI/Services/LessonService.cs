@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
 using PoznajAI.Exceptions;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,13 +14,11 @@ namespace PoznajAI.Services
     {
         private readonly ILessonRepository _lessonRepository;
         private readonly IMapper _mapper;
-        private readonly ILogger<LessonService> _logger;
 
-        public LessonService(ILessonRepository lessonRepository, IMapper mapper, ILogger<LessonService> logger)
+        public LessonService(ILessonRepository lessonRepository, IMapper mapper)
         {
             _lessonRepository = lessonRepository;
             _mapper = mapper;
-            _logger = logger;
         }
 
         public async Task<LessonDetailsDto> GetLessonById(Guid lessonId)
@@ -37,7 +36,8 @@ namespace PoznajAI.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while fetching the lesson by ID.");
+                
+                Log.Error(ex, "An error occurred while fetching the lesson by ID.");
                 throw;
             }
         }
@@ -49,13 +49,13 @@ namespace PoznajAI.Services
                 var lesson = _mapper.Map<Lesson>(lessonDto);
                 var createdLesson = await _lessonRepository.CreateLesson(lesson);
 
-                _logger.LogInformation("Lesson created: {@Lesson}", createdLesson);
+                Log.Information("Lesson created: {@Lesson}", createdLesson);
 
                 return createdLesson.Id;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while creating the lesson.");
+                Log.Error(ex, "An error occurred while creating the lesson.");
                 throw;
             }
         }
@@ -75,12 +75,12 @@ namespace PoznajAI.Services
 
                 await _lessonRepository.UpdateLesson(existingLesson);
 
-                _logger.LogInformation("Lesson updated: {@Lesson}", existingLesson);
+                Log.Information("Lesson updated: {@Lesson}", existingLesson);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while updating the lesson.");
+                Log.Error(ex, "An error occurred while updating the lesson.");
                 throw;
             }
         }
@@ -98,12 +98,12 @@ namespace PoznajAI.Services
 
                 var result = await _lessonRepository.DeleteLesson(lessonId);
 
-                _logger.LogInformation("Lesson deleted: {@Lesson}", existingLesson);
+                Log.Information("Lesson deleted: {@Lesson}", existingLesson);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while deleting the lesson.");
+                Log.Error(ex, "An error occurred while deleting the lesson.");
                 throw;
             }
         }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
 using PoznajAI.Models.User;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -15,13 +16,11 @@ namespace PoznajAI.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        private readonly ILogger<UserService> _logger;
 
-        public UserService(IUserRepository userRepository, IMapper mapper, ILogger<UserService> logger)
+        public UserService(IUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
             _mapper = mapper;
-            _logger = logger;
         }
 
         public async Task<UserDto> Authenticate(string username, string password)
@@ -65,12 +64,12 @@ namespace PoznajAI.Services
             try
             {
                 var userId = await _userRepository.CreateUser(user, UserRole.User);
-                _logger.LogInformation("User created: {@user}", user);
+                Log.Information("User created: {@user}", user);
                 return userId;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while creating the user.");
+                Log.Error(ex, "An error occurred while creating the user.");
                 throw;
             }
         }
@@ -111,10 +110,11 @@ namespace PoznajAI.Services
             try
             {
                 return await _userRepository.AddCourseToUser(userId, courseId);
+                Log.Information($"Add course: {courseId.ToString()} to user: {userId.ToString()}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while adding a course to the user.");
+                Log.Error(ex, "An error occurred while adding a course to the user.");
                 throw;
             }
         }
@@ -128,7 +128,7 @@ namespace PoznajAI.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while adding a role to the user.");
+                Log.Error(ex, "An error occurred while adding a role to the user.");
                 throw;
             }
         }

@@ -7,7 +7,10 @@ using PoznajAI.Configuration;
 using PoznajAI.Data.Data;
 using PoznajAI.Data.Repositories;
 using PoznajAI.Services;
+using Serilog.Sinks.MSSqlServer;
+using Serilog;
 using System.Text;
+using PoznajAI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -43,6 +46,8 @@ builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+
+builder.Services.AddSerilogLogging(config["ConnectionStrings:DefaultConnection"]);
 
 var mapperConfig = new MapperConfiguration(config =>
 {
@@ -125,5 +130,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+Log.Information("App started");
 app.Run();

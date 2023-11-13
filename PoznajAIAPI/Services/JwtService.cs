@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using PoznajAI.Models.User;
 using PoznajAI.Services;
+using Serilog;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -24,25 +25,35 @@ public class JwtService : IJwtService
 
     public string GenerateToken(UserDto userDto)
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_secretKey);
-        var tokenDescriptor = new SecurityTokenDescriptor
+        try
         {
-            Subject = new ClaimsIdentity(new[]
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_secretKey);
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
+                Subject = new ClaimsIdentity(new[]
+                {
             new Claim(ClaimTypes.Name, userDto.Username),
             new Claim(ClaimTypes.Email, userDto.Email),
             new Claim(ClaimTypes.Hash, userDto.Id.ToString())
             //new Claim(ClaimTypes.Role, userDto.Role) // Dodaj claim z rolą
         }),
-            Expires = DateTime.UtcNow.AddHours(12),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-            Issuer = _issuer,
-            Audience = _audience
-        };
+                Expires = DateTime.UtcNow.AddHours(12),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                Issuer = _issuer,
+                Audience = _audience
+            };
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+        catch (Exception ex) 
+        {
+            Log.Error(ex, $"Could not create token. UserId: {userDto.Id}");
+            return string.Empty;
+        }
+
+        
     }
 
     public async Task<UserDto> ValidateToken(string token)
@@ -80,6 +91,7 @@ public class JwtService : IJwtService
         }
         catch (Exception ex)
         {
+            Log.Error(ex, $"Token validation failed. Token: {token}");
             return null;
         }
     }

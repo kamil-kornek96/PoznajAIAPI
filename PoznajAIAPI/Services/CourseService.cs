@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using PoznajAI.Controllers;
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,13 +15,11 @@ namespace PoznajAI.Services
     {
         private readonly ICourseRepository _courseRepository;
         private readonly IMapper _mapper;
-        private readonly ILogger<CourseService> _logger;
 
-        public CourseService(ICourseRepository courseRepository, IMapper mapper, ILogger<CourseService> logger)
+        public CourseService(ICourseRepository courseRepository, IMapper mapper)
         {
             _courseRepository = courseRepository;
             _mapper = mapper;
-            _logger = logger;
         }
 
         public async Task<UserCoursesResponseDto> GetAllCoursesForUser(Guid userId)
@@ -42,7 +41,7 @@ namespace PoznajAI.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while fetching courses for the user.");
+                Log.Error(ex, "An error occurred while fetching courses for the user.");
                 throw;
             }
         }
@@ -54,13 +53,13 @@ namespace PoznajAI.Services
                 var course = _mapper.Map<Course>(courseDto);
                 var createdCourseId = await _courseRepository.CreateCourse(course);
 
-                _logger.LogInformation("Course created: {@Course}", course);
+                Log.Information("Course created: {@Course}", course);
 
                 return createdCourseId;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while creating the course.");
+                Log.Error(ex, "An error occurred while creating the course.");
                 throw;
             }
         }
@@ -81,7 +80,7 @@ namespace PoznajAI.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while fetching the course by ID.");
+                Log.Error(ex, "An error occurred while fetching the course by ID.");
                 throw;
             }
         }
@@ -100,12 +99,12 @@ namespace PoznajAI.Services
                 courseDto.Id = id;
                 await _courseRepository.UpdateCourse(_mapper.Map<Course>(courseDto));
 
-                _logger.LogInformation("Course updated: {@Course}", existingCourse);
+                Log.Information("Course updated: {@Course}", existingCourse);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while updating the course.");
+                Log.Error(ex, "An error occurred while updating the course.");
                 throw;
             }
         }
@@ -123,12 +122,12 @@ namespace PoznajAI.Services
 
                 await _courseRepository.DeleteCourse(id);
 
-                _logger.LogInformation("Course deleted: {@Course}", existingCourse);
+                Log.Information("Course deleted: {@Course}", existingCourse);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while deleting the course.");
+                Log.Error(ex, "An error occurred while deleting the course.");
                 throw;
             }
         }
