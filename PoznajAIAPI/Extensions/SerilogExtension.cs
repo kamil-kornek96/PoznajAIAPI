@@ -5,7 +5,7 @@ using System;
 
 namespace PoznajAI.Extensions
 {
-    public static class SerilogExtensions
+    public static class SerilogExtension
     {
         public static IServiceCollection AddSerilogLogging(this IServiceCollection services, string connectionString)
         {

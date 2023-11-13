@@ -11,6 +11,7 @@ using Serilog.Sinks.MSSqlServer;
 using Serilog;
 using System.Text;
 using PoznajAI.Extensions;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -48,6 +49,7 @@ builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 
 builder.Services.AddSerilogLogging(config["ConnectionStrings:DefaultConnection"]);
+builder.Services.AddHangfire(config["ConnectionStrings:HangfireConnection"]);
 
 var mapperConfig = new MapperConfiguration(config =>
 {
@@ -124,6 +126,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { app.Services.CreateScope().ServiceProvider.GetRequiredService<HangfireAuthorizationFilter>() }
+});
+
 app.UseCors("AllowLocalhost4200");
 app.UseHttpsRedirection();
 app.UseAuthentication();

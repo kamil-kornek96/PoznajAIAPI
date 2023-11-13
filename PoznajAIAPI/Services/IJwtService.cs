@@ -6,5 +6,6 @@ namespace PoznajAI.Services
     {
         string GenerateToken(UserDto userDto);
         Task<UserDto> ValidateToken(string token);
+        UserDto FastValidateToken(string token);
     }
 }

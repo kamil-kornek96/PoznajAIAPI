@@ -56,6 +56,46 @@ public class JwtService : IJwtService
         
     }
 
+    public UserDto FastValidateToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.UTF8.GetBytes(_secretKey);
+
+        try
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidIssuer = _issuer,
+                ValidAudience = _audience,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ClockSkew = TimeSpan.Zero
+            };
+
+            var claimsPrincipal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken validatedToken);
+
+            if (validatedToken is JwtSecurityToken jwtSecurityToken)
+            {
+                var username = claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value;
+                var email = claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value;
+                var id = claimsPrincipal.FindFirst(ClaimTypes.Hash)?.Value;
+                var userDto = new UserDto { Email = email, Id = new Guid(id), Username = username };
+
+                return userDto;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"Token validation failed. Token: {token}");
+            return null;
+        }
+    }
+
     public async Task<UserDto> ValidateToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using PoznajAI.Services.Video;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -10,6 +12,12 @@ namespace PoznajAI.Controllers
     public class FileUploadController : ControllerBase
     {
         private const string UploadFolder = "uploads"; // Katalog, w którym będą przechowywane przesłane pliki
+        private readonly VideoConversionService _conversionService;
+
+        public FileUploadController(VideoConversionService conversionService)
+        {
+            _conversionService = conversionService;
+        }
 
         [HttpPost("video-upload")]
         public async Task<IActionResult> UploadVideoAsync()
@@ -27,6 +35,8 @@ namespace PoznajAI.Controllers
                     {
                         await file.CopyToAsync(stream); // Zapisz przesłany plik na dysku
                     }
+
+                    BackgroundJob.Enqueue(() => _conversionService.ConvertVideo(filePath));
 
                     // Tutaj możesz dodać dodatkową logikę, np. zapis do bazy danych, przetwarzanie itp.
 
