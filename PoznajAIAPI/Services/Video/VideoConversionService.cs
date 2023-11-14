@@ -7,16 +7,20 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Streams;
+using Microsoft.AspNetCore.SignalR;
+using PoznajAI.Hubs;
 
 namespace PoznajAI.Services.Video
 {
-    public class VideoConversionService : IVideoConversionService
+    public class VideoConversionService : Hub, IVideoConversionService
     {
         private readonly IConfiguration _configuration;
+        private readonly IConversionHub _hub;
 
-        public VideoConversionService(IConfiguration configuration)
+        public VideoConversionService(IConfiguration configuration, IConversionHub hub)
         {
             _configuration = configuration;
+            _hub = hub;
         }
 
         public async Task ConvertVideo(string inputFilePath, CancellationToken cancellationToken = default)
@@ -50,22 +54,18 @@ namespace PoznajAI.Services.Video
                 if (!string.IsNullOrEmpty(resolution))
                     conversion.AddParameter($"-vf scale={resolution}");
 
-                // Przechwyć dane i postęp z FFmpeg
-                conversion.OnProgress += (sender, args) =>
+                conversion.OnProgress += async (sender, args) =>
                 {
                     var percent = (int)(Math.Round(args.Duration.TotalSeconds / args.TotalLength.TotalSeconds, 2) * 100);
-                    Log.Information($"[{args.Duration} / {args.TotalLength}] {percent}%");
-                };
-
-                conversion.OnDataReceived += (sender, args) =>
-                {
-                    Log.Information($"{args.Data}{Environment.NewLine}");
+                    await _hub.SendConversionStatus(Path.GetFileName(inputFilePath), $"In progress... {percent}%");
                 };
 
                 // Rozpocznij konwersję z obsługą CancellationToken
                 await conversion.Start(cancellationToken);
-
                 Log.Information($"Finished conversion file [{Path.GetFileName(inputFilePath)}]");
+
+                File.Delete(inputFilePath);
+                Log.Information($"Source file [{Path.GetFileName(inputFilePath)}] deleted.");
             }
             catch (Exception ex)
             {

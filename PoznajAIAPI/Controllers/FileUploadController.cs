@@ -1,26 +1,30 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.StaticFiles;
+using PoznajAI.Hubs;
 using PoznajAI.Services.Video;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace PoznajAI.Controllers
 {
-    [Route("api")]
+    [Route("api/uploads")]
     [ApiController]
     public class FileUploadController : ControllerBase
     {
         private const string TempFolder = "uploads\\temp";
         private const string VideosFolder = "uploads\\videos";
         private readonly IVideoConversionService _conversionService;
+        private readonly IConversionHub _hub;
 
-        public FileUploadController(IVideoConversionService conversionService)
+        public FileUploadController(IVideoConversionService conversionService, IConversionHub hub)
         {
             _conversionService = conversionService;
+            _hub = hub;
         }
 
-        [HttpPost("video-upload")]
+        [HttpPost("video")]
         public async Task<IActionResult> UploadVideoAsync()
         {
             try
@@ -29,7 +33,7 @@ namespace PoznajAI.Controllers
 
                 if (file.Length > 0)
                 {
-                    var fileName = Path.Combine(Path.GetRandomFileName().Split('.').First()+'.'+file.FileName.Split('.').Last()); // Generuj unikalną nazwę pliku
+                    var fileName = Path.Combine(Path.GetRandomFileName().Split('.').First() + '.' + file.FileName.Split('.').Last()); // Generuj unikalną nazwę pliku
                     var filePath = Path.Combine(Directory.GetCurrentDirectory(), TempFolder, fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -52,7 +56,7 @@ namespace PoznajAI.Controllers
             }
         }
 
-        [HttpGet("uploads/{fileName}")]
+        [HttpGet("video/{fileName}")]
         public IActionResult GetVideo(string fileName)
         {
             try
@@ -99,6 +103,13 @@ namespace PoznajAI.Controllers
             {
                 return StatusCode(500, $"Wystąpił błąd: {ex.Message}");
             }
+        }
+
+        [HttpGet("video/test")]
+        public IActionResult Teste()
+        {
+            _hub.SendConversionStatus("testt", "testetes");
+            return Ok();
         }
     }
 }

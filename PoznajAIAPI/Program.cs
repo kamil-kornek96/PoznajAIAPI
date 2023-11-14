@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -13,6 +14,8 @@ using System.Text;
 using PoznajAI.Extensions;
 using Hangfire;
 using PoznajAI.Services.Video;
+using PoznajAI.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -38,7 +41,13 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" });
+});
 
+builder.Services.AddSignalR();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
@@ -51,8 +60,7 @@ builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 
 builder.Services.AddScoped<IVideoConversionService, VideoConversionService>();
 
-
-
+builder.Services.AddScoped<IConversionHub, ConversionHub>();
 builder.Services.AddSerilogLogging(config["ConnectionStrings:DefaultConnection"]);
 builder.Services.AddHangfire(config["ConnectionStrings:HangfireConnection"]);
 
@@ -132,6 +140,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+
+app.UseRouting();
 app.UseCors("AllowLocalhost4200");
 
 app.UseHangfireDashboard("/api/hangfire", new DashboardOptions
@@ -143,6 +154,10 @@ app.UseHangfireDashboard("/api/hangfire", new DashboardOptions
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<ConversionHub>("/conversionHub");
+
+
 
 app.MapControllers();
 Log.Information("App started");
