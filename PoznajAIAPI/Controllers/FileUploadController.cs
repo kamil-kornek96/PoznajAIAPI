@@ -11,10 +11,11 @@ namespace PoznajAI.Controllers
     [ApiController]
     public class FileUploadController : ControllerBase
     {
-        private const string UploadFolder = "uploads"; // Katalog, w którym będą przechowywane przesłane pliki
-        private readonly VideoConversionService _conversionService;
+        private const string TempFolder = "uploads\\temp";
+        private const string VideosFolder = "uploads\\videos";
+        private readonly IVideoConversionService _conversionService;
 
-        public FileUploadController(VideoConversionService conversionService)
+        public FileUploadController(IVideoConversionService conversionService)
         {
             _conversionService = conversionService;
         }
@@ -28,15 +29,15 @@ namespace PoznajAI.Controllers
 
                 if (file.Length > 0)
                 {
-                    var fileName = Path.Combine(UploadFolder, Path.GetRandomFileName().Split('.').First()+'.'+file.FileName.Split('.').Last()); // Generuj unikalną nazwę pliku
-                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
+                    var fileName = Path.Combine(Path.GetRandomFileName().Split('.').First()+'.'+file.FileName.Split('.').Last()); // Generuj unikalną nazwę pliku
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), TempFolder, fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await file.CopyToAsync(stream); // Zapisz przesłany plik na dysku
                     }
 
-                    BackgroundJob.Enqueue(() => _conversionService.ConvertVideo(filePath));
+                    BackgroundJob.Enqueue(() => _conversionService.ConvertVideo(filePath, CancellationToken.None));
 
                     // Tutaj możesz dodać dodatkową logikę, np. zapis do bazy danych, przetwarzanie itp.
 
@@ -56,7 +57,25 @@ namespace PoznajAI.Controllers
         {
             try
             {
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(),UploadFolder, fileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), VideosFolder, fileName);
+
+                if (System.IO.File.Exists(filePath))
+                {
+                    var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+
+                    // Określ MIME Type na podstawie rozszerzenia pliku
+                    var mimeType = "application/octet-stream"; // Domyślny MIME Type
+
+                    var provider = new FileExtensionContentTypeProvider();
+                    if (provider.TryGetContentType(fileName, out var outMimeType))
+                    {
+                        mimeType = outMimeType;
+                    }
+
+                    return File(fileStream, mimeType, fileName);
+                }
+
+                filePath = Path.Combine(Directory.GetCurrentDirectory(), TempFolder, fileName);
 
                 if (System.IO.File.Exists(filePath))
                 {

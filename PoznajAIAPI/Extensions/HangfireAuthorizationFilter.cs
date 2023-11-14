@@ -19,9 +19,9 @@ public class HangfireAuthorizationFilter : IDashboardAuthorizationFilter
         // Implement your own authentication logic here
         var httpContext = context.GetHttpContext();
         StringValues authorizationHeader;
-        if (httpContext.Request.Headers.TryGetValue("Authorization", out authorizationHeader))
+        var token = httpContext.Request.Query["token"].ToString();
+        if (!String.IsNullOrEmpty(token))
         {
-            var token = authorizationHeader.ToString().Replace("Bearer ", "");
             var user = _jwtService.FastValidateToken(token);
             if (_configuration["Hangfire:AccessId"] == user.Id.ToString())
             {

@@ -12,6 +12,7 @@ using Serilog;
 using System.Text;
 using PoznajAI.Extensions;
 using Hangfire;
+using PoznajAI.Services.Video;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -47,6 +48,10 @@ builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+
+builder.Services.AddScoped<IVideoConversionService, VideoConversionService>();
+
+
 
 builder.Services.AddSerilogLogging(config["ConnectionStrings:DefaultConnection"]);
 builder.Services.AddHangfire(config["ConnectionStrings:HangfireConnection"]);
@@ -127,12 +132,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHangfireDashboard("/hangfire", new DashboardOptions
+app.UseCors("AllowLocalhost4200");
+
+app.UseHangfireDashboard("/api/hangfire", new DashboardOptions
 {
     Authorization = new[] { app.Services.CreateScope().ServiceProvider.GetRequiredService<HangfireAuthorizationFilter>() }
 });
 
-app.UseCors("AllowLocalhost4200");
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
