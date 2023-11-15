@@ -15,12 +15,11 @@ namespace PoznajAI.Services.Video
     public class VideoConversionService : Hub, IVideoConversionService
     {
         private readonly IConfiguration _configuration;
-        private readonly IConversionHub _hub;
 
-        public VideoConversionService(IConfiguration configuration, IConversionHub hub)
+
+        public VideoConversionService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _hub = hub;
         }
 
         public async Task ConvertVideo(string inputFilePath, CancellationToken cancellationToken = default)
@@ -57,7 +56,7 @@ namespace PoznajAI.Services.Video
                 conversion.OnProgress += async (sender, args) =>
                 {
                     var percent = (int)(Math.Round(args.Duration.TotalSeconds / args.TotalLength.TotalSeconds, 2) * 100);
-                    await _hub.SendConversionStatus(Path.GetFileName(inputFilePath), $"In progress... {percent}%");
+
                 };
 
                 // Rozpocznij konwersję z obsługą CancellationToken

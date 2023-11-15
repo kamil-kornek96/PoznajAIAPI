@@ -16,12 +16,10 @@ namespace PoznajAI.Controllers
         private const string TempFolder = "uploads\\temp";
         private const string VideosFolder = "uploads\\videos";
         private readonly IVideoConversionService _conversionService;
-        private readonly IConversionHub _hub;
 
-        public FileUploadController(IVideoConversionService conversionService, IConversionHub hub)
+        public FileUploadController(IVideoConversionService conversionService)
         {
             _conversionService = conversionService;
-            _hub = hub;
         }
 
         [HttpPost("video")]
@@ -105,11 +103,5 @@ namespace PoznajAI.Controllers
             }
         }
 
-        [HttpGet("video/test")]
-        public IActionResult Teste()
-        {
-            _hub.SendConversionStatus("testt", "testetes");
-            return Ok();
-        }
     }
 }

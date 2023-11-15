@@ -15,7 +15,9 @@ using PoznajAI.Extensions;
 using Hangfire;
 using PoznajAI.Services.Video;
 using PoznajAI.Hubs;
-using Microsoft.AspNetCore.SignalR;
+using System.Net.WebSockets;
+using System.Net;
+using PoznajAI.Websockets.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -47,7 +49,6 @@ builder.Services.AddResponseCompression(opts =>
         new[] { "application/octet-stream" });
 });
 
-builder.Services.AddSignalR();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
@@ -60,7 +61,6 @@ builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 
 builder.Services.AddScoped<IVideoConversionService, VideoConversionService>();
 
-builder.Services.AddScoped<IConversionHub, ConversionHub>();
 builder.Services.AddSerilogLogging(config["ConnectionStrings:DefaultConnection"]);
 builder.Services.AddHangfire(config["ConnectionStrings:HangfireConnection"]);
 
@@ -91,6 +91,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddAuthorization();
+builder.Services.AddWebsocketsClient();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -143,6 +144,27 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseRouting();
+var wsOptions = new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(120) };
+app.UseWebSockets(wsOptions);
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path == "/send")
+    {
+        if (context.WebSockets.IsWebSocketRequest)
+        {
+            using(WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync())
+            {
+                await Send(context, webSocket);
+            }
+        }
+        else
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;//sprawdziæ
+        }
+    }
+    await next();
+});
+
 app.UseCors("AllowLocalhost4200");
 
 app.UseHangfireDashboard("/api/hangfire", new DashboardOptions
@@ -155,10 +177,30 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHub<ConversionHub>("/conversionHub");
+
 
 
 
 app.MapControllers();
 Log.Information("App started");
 app.Run();
+
+
+
+async Task Send(HttpContext context, WebSocket webSocket)
+{
+    var buffer = new byte[1024 * 4];
+    WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), System.Threading.CancellationToken.None);
+    if(result != null)
+    {
+        while(!result.CloseStatus.HasValue)
+        {
+            string msg = Encoding.UTF8.GetString(new ArraySegment<byte>(buffer,0,result.Count));
+            Console.WriteLine($"clieny says {msg}");
+            await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"Server says: {DateTime.UtcNow:f}")),result.MessageType,result.EndOfMessage,System.Threading.CancellationToken.None);
+            result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), System.Threading.CancellationToken.None);
+            Console.WriteLine(result);
+        }
+    }
+    await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, System.Threading.CancellationToken.None);
+};

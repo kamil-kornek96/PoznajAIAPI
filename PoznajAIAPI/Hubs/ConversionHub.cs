@@ -4,21 +4,18 @@ using System.Threading.Tasks;
 
 namespace PoznajAI.Hubs
 {
-    public sealed class ConversionHub : Hub, IConversionHub
+    public interface ITypedHubClient
     {
+        Task BroadcastMessage(Message message);
+    }
+    public  class ConversionHub : Hub<ITypedHubClient>
+    {
+    }
 
-        public ConversionHub()
-        {
 
-        }
-        public async Task SendConversionStatus(string fileName, string status)
-        {
-            await Clients.All.SendAsync(fileName, status);
-        }
-
-        public override async Task OnConnectedAsync()
-        {
-            await Clients.All.SendAsync("ReceiveMessage", $"{Context.ConnectionId} has joined");
-        }
+    public class Message
+    {
+        public string Type { get; set; }
+        public string Information { get; set; }
     }
 }
