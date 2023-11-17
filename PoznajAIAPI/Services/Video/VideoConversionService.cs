@@ -1,25 +1,20 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.SignalR;
+using PoznajAI.Hubs;
 using Serilog;
 using Xabe.FFmpeg;
-using Xabe.FFmpeg.Streams;
-using Microsoft.AspNetCore.SignalR;
-using PoznajAI.Hubs;
 
 namespace PoznajAI.Services.Video
 {
     public class VideoConversionService : Hub, IVideoConversionService
     {
         private readonly IConfiguration _configuration;
+        private readonly IHubContext<VideoConversionHub> _hubContext;
 
 
-        public VideoConversionService(IConfiguration configuration)
+        public VideoConversionService(IConfiguration configuration, IHubContext<VideoConversionHub> hubContext)
         {
             _configuration = configuration;
+            _hubContext = hubContext;
         }
 
         public async Task ConvertVideo(string inputFilePath, CancellationToken cancellationToken = default)
@@ -35,11 +30,9 @@ namespace PoznajAI.Services.Video
 
                 var conversion = FFmpeg.Conversions.New()
                     .AddStream(audioStream, videoStream)
-                    .AddParameter("-re", ParameterPosition.PreInput)  // Dodaj parametr przed wejściem
+                    .AddParameter("-re", ParameterPosition.PreInput)
                     .SetOutput(outputPath);
 
-                // Dodaj dodatkowe parametry konwersji, np. zmniejszenie rozmiaru
-                // Pobierz ustawienia z konfiguracji
                 var videoBitrate = _configuration.GetValue<int>("VideoConversion:VideoBitrate");
                 var audioBitrate = _configuration.GetValue<int>("VideoConversion:AudioBitrate");
                 var resolution = _configuration.GetValue<string>("VideoConversion:Resolution");
@@ -55,12 +48,14 @@ namespace PoznajAI.Services.Video
 
                 conversion.OnProgress += async (sender, args) =>
                 {
-                    var percent = (int)(Math.Round(args.Duration.TotalSeconds / args.TotalLength.TotalSeconds, 2) * 100);
+                    var percent = (int)((args.Duration.TotalSeconds / args.TotalLength.TotalSeconds) * 100);
+                    var filename = Path.GetFileName(inputFilePath);
+                    await _hubContext.Clients.All.SendAsync(filename, new { FileName = filename, Progress = percent });
 
                 };
 
-                // Rozpocznij konwersję z obsługą CancellationToken
                 await conversion.Start(cancellationToken);
+                await _hubContext.Clients.All.SendAsync(Path.GetFileName(inputFilePath), new { FileName = Path.GetFileName(inputFilePath), Progress = -1 });
                 Log.Information($"Finished conversion file [{Path.GetFileName(inputFilePath)}]");
 
                 File.Delete(inputFilePath);
@@ -68,14 +63,13 @@ namespace PoznajAI.Services.Video
             }
             catch (Exception ex)
             {
-                // Obsłuż błędy konwersji
-                Log.Information($"Error during video conversion: {ex.Message}");
+                Log.Error($"Error during video conversion: {ex.Message}");
             }
         }
 
         private string GetOutputPath(string inputFilePath)
         {
-            return inputFilePath.Replace("temp","videos");
+            return inputFilePath.Replace("temp", "videos");
         }
     }
 }

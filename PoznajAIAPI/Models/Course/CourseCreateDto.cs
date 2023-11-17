@@ -1,6 +1,4 @@
-﻿using PoznajAI.Data.Models;
-
-namespace PoznajAI.Services
+﻿namespace PoznajAI.Services
 {
     public class CourseCreateDto
     {

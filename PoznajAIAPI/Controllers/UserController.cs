@@ -5,9 +5,6 @@ using PoznajAI.Data.Models;
 using PoznajAI.Models.Auth;
 using PoznajAI.Models.User;
 using PoznajAI.Services;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace PoznajAI.Controllers
 {
@@ -37,7 +34,7 @@ namespace PoznajAI.Controllers
 
             var token = _jwtService.GenerateToken(userDto);
 
-            return Ok(new {message="Pomyślnie zalogowano!", token });
+            return Ok(new { message = "Pomyślnie zalogowano!", token });
         }
 
         [HttpGet]
@@ -160,7 +157,7 @@ namespace PoznajAI.Controllers
                 return NotFound(new { message = "User not found" });
             }
 
-            return Ok(new { message = "",user });
+            return Ok(new { message = "", user });
         }
     }
 }

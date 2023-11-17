@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PoznajAI.Exceptions
+﻿namespace PoznajAI.Exceptions
 {
     public class NotFoundException : Exception
     {

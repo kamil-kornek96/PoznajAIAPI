@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using PoznajAI.Services;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PoznajAI.Controllers
 {

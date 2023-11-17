@@ -1,9 +1,4 @@
-﻿using Serilog.Sinks.MSSqlServer;
-using Serilog;
-using Hangfire;
-using Hangfire.SqlServer;
-using Hangfire.Dashboard;
-using PoznajAI.Services;
+﻿using Hangfire;
 
 namespace PoznajAI.Extensions
 {

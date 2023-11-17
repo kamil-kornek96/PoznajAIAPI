@@ -1,13 +1,8 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
 using PoznajAI.Controllers;
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PoznajAI.Services
 {

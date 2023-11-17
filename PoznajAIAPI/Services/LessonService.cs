@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
 using PoznajAI.Exceptions;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace PoznajAI.Services
 {
@@ -36,7 +32,7 @@ namespace PoznajAI.Services
             }
             catch (Exception ex)
             {
-                
+
                 Log.Error(ex, "An error occurred while fetching the lesson by ID.");
                 throw;
             }

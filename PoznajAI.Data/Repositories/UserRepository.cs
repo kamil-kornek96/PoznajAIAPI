@@ -1,10 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PoznajAI.Data.Data;
 using PoznajAI.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PoznajAI.Data.Repositories
 {

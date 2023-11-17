@@ -1,21 +1,14 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging.Abstractions;
-using System.Threading.Tasks;
 
 namespace PoznajAI.Hubs
 {
-    public interface ITypedHubClient
+
+    public class VideoConversionHub : Hub
     {
-        Task BroadcastMessage(Message message);
-    }
-    public  class ConversionHub : Hub<ITypedHubClient>
-    {
+        public async Task SendConversionProgress(string fileName, int progress)
+        {
+            await Clients.All.SendAsync("ConversionProgress", new { FileName = fileName, Progress = progress });
+        }
     }
 
-
-    public class Message
-    {
-        public string Type { get; set; }
-        public string Information { get; set; }
-    }
 }

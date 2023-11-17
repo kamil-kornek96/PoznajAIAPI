@@ -1,5 +1,4 @@
 ﻿using Hangfire.Dashboard;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using PoznajAI.Services;
 
@@ -16,7 +15,6 @@ public class HangfireAuthorizationFilter : IDashboardAuthorizationFilter
 
     public bool Authorize(DashboardContext context)
     {
-        // Implement your own authentication logic here
         var httpContext = context.GetHttpContext();
         StringValues authorizationHeader;
         var token = httpContext.Request.Query["token"].ToString();

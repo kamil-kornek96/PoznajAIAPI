@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using System;
 
 public class StringToGuidConverter : ITypeConverter<string, Guid>
 {

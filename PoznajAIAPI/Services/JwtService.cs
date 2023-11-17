@@ -47,13 +47,13 @@ public class JwtService : IJwtService
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             Log.Error(ex, $"Could not create token. UserId: {userDto.Id}");
             return string.Empty;
         }
 
-        
+
     }
 
     public UserDto FastValidateToken(string token)

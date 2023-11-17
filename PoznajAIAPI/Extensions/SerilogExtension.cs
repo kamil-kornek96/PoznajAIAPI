@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Serilog;
+﻿using Serilog;
 using Serilog.Sinks.MSSqlServer;
-using System;
 
 namespace PoznajAI.Extensions
 {

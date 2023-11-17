@@ -1,11 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.StaticFiles;
-using PoznajAI.Hubs;
 using PoznajAI.Services.Video;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace PoznajAI.Controllers
 {
@@ -22,6 +18,7 @@ namespace PoznajAI.Controllers
             _conversionService = conversionService;
         }
 
+        [RequestSizeLimit(100_000_000)]
         [HttpPost("video")]
         public async Task<IActionResult> UploadVideoAsync()
         {
@@ -102,6 +99,5 @@ namespace PoznajAI.Controllers
                 return StatusCode(500, $"Wystąpił błąd: {ex.Message}");
             }
         }
-
     }
 }

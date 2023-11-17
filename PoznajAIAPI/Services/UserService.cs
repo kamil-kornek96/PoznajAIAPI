@@ -1,14 +1,10 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
 using PoznajAI.Models.User;
 using Serilog;
-using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PoznajAI.Services
 {
@@ -109,8 +105,8 @@ namespace PoznajAI.Services
         {
             try
             {
-                return await _userRepository.AddCourseToUser(userId, courseId);
                 Log.Information($"Add course: {courseId.ToString()} to user: {userId.ToString()}");
+                return await _userRepository.AddCourseToUser(userId, courseId);
             }
             catch (Exception ex)
             {

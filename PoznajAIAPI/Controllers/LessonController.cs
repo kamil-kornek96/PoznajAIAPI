@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using PoznajAI.Services;
-using System;
-using System.Threading.Tasks;
 
 namespace PoznajAI.Controllers
 {
@@ -74,7 +72,7 @@ namespace PoznajAI.Controllers
                 }
 
                 lessonDto.Id = id;
-                await _lessonService.UpdateLesson(id,lessonDto);
+                await _lessonService.UpdateLesson(id, lessonDto);
 
                 return Ok(new { message = "Zaktualizowano lekcje." });
             }
