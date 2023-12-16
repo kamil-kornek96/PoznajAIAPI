@@ -33,7 +33,7 @@ namespace PoznajAI.Controllers
                 }
 
                 var userDto = await _jwtService.ValidateToken(token);
-                var courses = await _courseService.GetAllCoursesForUser(userDto.Id);
+                var courses = await _courseService.GetAllCoursesForUser(userDto);
                 return Ok(courses);
             }
             catch (Exception ex)
