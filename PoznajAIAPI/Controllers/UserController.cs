@@ -25,7 +25,7 @@ namespace PoznajAI.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(LoginRequestDto model)
         {
-            var userDto = await _userService.Authenticate(model.Username, model.Password);
+            var userDto = await _userService.Authenticate(model.Email, model.Password);
 
             if (userDto == null)
             {
@@ -58,7 +58,8 @@ namespace PoznajAI.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<string>> Register(RegisterRequestDto model)
         {
-            if (await _userService.IsUsernameTaken(model.Username))
+
+            if (await _userService.IsEmailTaken(model.Email))
             {
                 return BadRequest(new { message = "Nazwa użytkownika jest zajęta." });
             }
@@ -68,7 +69,6 @@ namespace PoznajAI.Controllers
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Email = model.Email,
-                Username = model.Username,
                 Password = model.Password
             };
 
@@ -81,7 +81,7 @@ namespace PoznajAI.Controllers
                     return BadRequest(new { message = "Podczas rejestracji użytkownika, wystąpił błąd." });
                 }
 
-                var addedUserDto = await _userService.Authenticate(model.Username, model.Password);
+                var addedUserDto = await _userService.Authenticate(model.Email, model.Password);
 
                 if (addedUserDto == null)
                 {
