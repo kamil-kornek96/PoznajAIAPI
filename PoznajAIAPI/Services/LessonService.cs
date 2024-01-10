@@ -2,6 +2,8 @@
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
 using PoznajAI.Exceptions;
+using PoznajAI.Models.Course;
+using PoznajAI.Models.Lesson;
 using Serilog;
 
 namespace PoznajAI.Services
@@ -38,7 +40,7 @@ namespace PoznajAI.Services
             }
         }
 
-        public async Task<Guid> CreateLesson(CreateLessonDto lessonDto)
+        public async Task<LessonDto> CreateLesson(CreateLessonDto lessonDto)
         {
             try
             {
@@ -47,7 +49,7 @@ namespace PoznajAI.Services
 
                 Log.Information("Lesson created: {@Lesson}", createdLesson);
 
-                return createdLesson.Id;
+                return _mapper.Map<LessonDto>(createdLesson);
             }
             catch (Exception ex)
             {

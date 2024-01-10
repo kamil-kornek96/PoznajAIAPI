@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using PoznajAI.Controllers;
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
+using PoznajAI.Models.Course;
 using PoznajAI.Models.User;
 using Serilog;
 
@@ -55,16 +55,16 @@ namespace PoznajAI.Services
             }
         }
 
-        public async Task<Guid> CreateCourse(CourseCreateDto courseDto)
+        public async Task<CourseDto> CreateCourse(CourseCreateDto courseDto)
         {
             try
             {
                 var course = _mapper.Map<Course>(courseDto);
-                var createdCourseId = await _courseRepository.CreateCourse(course);
+                var createdCourse = await _courseRepository.CreateCourse(course);
 
                 Log.Information("Course created: {@Course}", course);
 
-                return createdCourseId;
+                return _mapper.Map<CourseDto>(createdCourse);
             }
             catch (Exception ex)
             {
@@ -72,6 +72,7 @@ namespace PoznajAI.Services
                 throw;
             }
         }
+
 
         public async Task<CourseDto> GetCourseById(Guid id)
         {

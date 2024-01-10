@@ -29,13 +29,13 @@ namespace PoznajAI.Data.Repositories
             return await _dbContext.Courses.Include(c => c.Lessons).ToListAsync();
         }
 
-        public async Task<Guid> CreateCourse(Course course)
+        public async Task<Course> CreateCourse(Course course)
         {
             try
             {
                 await _dbContext.Courses.AddAsync(course);
                 await _dbContext.SaveChangesAsync();
-                return course.Id;
+                return course;
             }
             catch (Exception ex)
             {

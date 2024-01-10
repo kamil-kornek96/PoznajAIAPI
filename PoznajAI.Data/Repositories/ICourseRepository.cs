@@ -4,7 +4,7 @@ namespace PoznajAI.Data.Repositories
 {
     public interface ICourseRepository
     {
-        Task<Guid> CreateCourse(Course course);
+        Task<Course> CreateCourse(Course course);
         Task<bool> DeleteCourse(Guid courseId);
         Task<IEnumerable<Course>> GetAllCourses();
         Task<IEnumerable<Course>> GetAllCoursesForUser(Guid userId);

@@ -7,6 +7,7 @@
     <UserSecretsId>e4f7646b-7bc0-4e77-a4e9-19a192c5b485</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,6 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PoznajAI.Data\PoznajAI.Data.csproj" />
+    <ProjectReference Include="..\PoznajAI.Websockets.Client\PoznajAI.Websockets.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

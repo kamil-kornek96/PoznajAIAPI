@@ -19,6 +19,7 @@ namespace PoznajAI.Extensions
             services.AddScoped<ICourseRepository, CourseRepository>();
 
             services.AddScoped<IVideoConversionService, VideoConversionService>();
+            services.AddSingleton<WebSocketService>();
 
             return services;
         }

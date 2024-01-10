@@ -3,23 +3,31 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using PoznajAI.Data.Models;
 using PoznajAI.Models.Auth;
+using PoznajAI.Models.Course;
 using PoznajAI.Models.User;
 using PoznajAI.Services;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PoznajAI.Controllers
 {
     [ApiController]
     [EnableCors("AllowLocalhost4200")]
-    [Route("api/[controller]")]
+    [Route("api/user")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ICourseService _courseService;
         private readonly IJwtService _jwtService;
 
-        public UserController(IUserService userService, IJwtService jwtService)
+        public UserController(IUserService userService, IJwtService jwtService, ICourseService courseService)
         {
             _userService = userService;
             _jwtService = jwtService;
+            _courseService = courseService;
         }
 
         [HttpPost("login")]
@@ -29,12 +37,12 @@ namespace PoznajAI.Controllers
 
             if (userDto == null)
             {
-                return BadRequest(new { message = "Nazwa użytkownika lub hasło są nieprawidłowe." });
+                return BadRequest(new { message = "Username or password is incorrect." });
             }
 
             var token = _jwtService.GenerateToken(userDto);
 
-            return Ok(new { message = "Pomyślnie zalogowano!", token });
+            return Ok(new { message = "Successfully logged in!", token });
         }
 
         [HttpGet]
@@ -61,7 +69,7 @@ namespace PoznajAI.Controllers
 
             if (await _userService.IsEmailTaken(model.Email))
             {
-                return BadRequest(new { message = "Nazwa użytkownika jest zajęta." });
+                return BadRequest(new { message = "Username is taken." });
             }
 
             var userDto = new UserCreateDto
@@ -78,14 +86,14 @@ namespace PoznajAI.Controllers
 
                 if (userId == Guid.Empty)
                 {
-                    return BadRequest(new { message = "Podczas rejestracji użytkownika, wystąpił błąd." });
+                    return BadRequest(new { message = "Error occurred while registering user." });
                 }
 
                 var addedUserDto = await _userService.Authenticate(model.Email, model.Password);
 
                 if (addedUserDto == null)
                 {
-                    return BadRequest(new { message = "Nazwa użytkownika lub hasło są nieprawidłowe." });
+                    return BadRequest(new { message = "Username or password is incorrect." });
                 }
 
                 var token = _jwtService.GenerateToken(addedUserDto);
@@ -98,45 +106,79 @@ namespace PoznajAI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Podczas rejestracji użytkownika, wystąpił błąd." });
+                return StatusCode(500, new { message = "Error occurred while registering user." });
             }
         }
 
         [Authorize]
-        [HttpGet("check-auth")]
+        [HttpGet("courses")]
+        public async Task<ActionResult<UserCoursesResponseDto>> GetAllCoursesForUser()
+        {
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Unauthorized(new { message = "Unauthorized user" });
+                }
+
+                var userDto = await _jwtService.ValidateToken(token);
+                var courses = await _courseService.GetAllCoursesForUser(userDto);
+
+                return Ok(courses);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error fetching user courses");
+                return StatusCode(500, new { message = "Error retrieving user courses" });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("auth")]
         public async Task<ActionResult> CheckAuthentication()
         {
             var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
             if (string.IsNullOrEmpty(token))
             {
-                return Unauthorized(new { message = "Brak tokena" });
+                return Unauthorized(new { message = "Token not found" });
             }
 
             var userDto = await _jwtService.ValidateToken(token);
 
             if (userDto == null)
             {
-                return Unauthorized(new { message = "Niepoprawny token" });
+                return Unauthorized(new { message = "Invalid token" });
             }
 
             return Ok(new
             {
-                message = "Użytkownik zautoryzowany",
+                message = "User authenticated",
                 user = userDto
             });
         }
 
         [Authorize]
-        [HttpPost("add-course")]
-        public async Task<ActionResult> AddCourseToUser([FromBody] CourseAssignmentDto assignment)
+        [HttpPost("courses/{courseId}")]
+        public async Task<ActionResult> AddCourseToUser(Guid courseId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var isAdded = await _userService.AddCourseToUser(new Guid(assignment.UserId), new Guid(assignment.CourseId));
+            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return Unauthorized(new { message = "Token not found" });
+            }
+
+            var userDto = await _jwtService.ValidateToken(token);
+
+            var isAdded = await _userService.AddCourseToUser(userDto.Id, courseId);
 
             if (isAdded)
             {

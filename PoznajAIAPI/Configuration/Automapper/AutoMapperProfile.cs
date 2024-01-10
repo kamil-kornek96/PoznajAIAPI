@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using PoznajAI.Controllers;
 using PoznajAI.Data.Models;
 using PoznajAI.Models.Auth;
+using PoznajAI.Models.Course;
+using PoznajAI.Models.Lesson;
 using PoznajAI.Models.User;
-using PoznajAI.Services;
 
-namespace PoznajAI.Configuration
+namespace PoznajAI.Configuration.Automapper
 {
     public class AutoMapperProfiles : Profile
     {

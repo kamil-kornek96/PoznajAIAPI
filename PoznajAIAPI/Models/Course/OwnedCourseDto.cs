@@ -1,4 +1,6 @@
-﻿namespace PoznajAI.Services
+﻿using PoznajAI.Models.Lesson;
+
+namespace PoznajAI.Models.Course
 {
     public class OwnedCourseDto
     {

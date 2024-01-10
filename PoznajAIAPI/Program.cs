@@ -2,11 +2,12 @@ using AutoMapper;
 using Hangfire;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
-using PoznajAI.Configuration;
+using PoznajAI.Configuration.Automapper;
 using PoznajAI.Data.Data;
 using PoznajAI.Extensions;
-using PoznajAI.Hubs;
 using Serilog;
+using PoznajAI.Websockets.Client;
+using PoznajAI.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -36,14 +37,11 @@ builder.Services.AddCors(options =>
                    .AllowCredentials();
         });
 });
-
 builder.Services.AddResponseCompression(opts =>
 {
     opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
         new[] { "application/octet-stream" });
 });
-
-
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(config.GetConnectionString("DefaultConnection"));
@@ -54,6 +52,7 @@ builder.Services.AddSignalR();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerSettings();
+builder.Services.AddWebsocketsClient();
 
 var app = builder.Build();
 
@@ -64,24 +63,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowLocalhost4200");
-
-app.UseHangfireDashboard("/api/hangfire", new DashboardOptions
-{
-    Authorization = new[] { app.Services.CreateScope().ServiceProvider.GetRequiredService<HangfireAuthorizationFilter>() }
-});
-
-app.UseHttpsRedirection();
+ConfigManager.ConfigureWebsockets(app);
+ConfigManager.ConfigureVideoConversionHub(app);
+ConfigManager.ConfigureHangFire(app);
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapHub<VideoConversionHub>("/video-conversion-hub");
-    endpoints.MapControllers();
-});
-
 app.MapControllers();
 Log.Information("App started");
 app.Run();
