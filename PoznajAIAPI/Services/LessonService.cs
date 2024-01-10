@@ -2,7 +2,6 @@
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
 using PoznajAI.Exceptions;
-using PoznajAI.Models.Course;
 using PoznajAI.Models.Lesson;
 using Serilog;
 

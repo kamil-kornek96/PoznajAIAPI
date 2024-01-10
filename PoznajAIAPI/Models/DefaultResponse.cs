@@ -4,13 +4,13 @@
     {
         public DefaultResponse()
         {
-            
+
         }
         public DefaultResponse(int status, string message, bool success, T? data)
         {
-            Status = status; 
-            Message = message; 
-            Success = success; 
+            Status = status;
+            Message = message;
+            Success = success;
             Data = data;
         }
 

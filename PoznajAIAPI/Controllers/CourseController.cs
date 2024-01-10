@@ -5,8 +5,6 @@ using PoznajAI.Models;
 using PoznajAI.Models.Course;
 using PoznajAI.Services;
 using Serilog;
-using System;
-using System.Threading.Tasks;
 
 namespace PoznajAI.Controllers
 {

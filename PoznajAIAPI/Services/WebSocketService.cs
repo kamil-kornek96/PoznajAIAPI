@@ -1,5 +1,5 @@
-﻿using System.Net.WebSockets;
-using System.Net;
+﻿using System.Net;
+using System.Net.WebSockets;
 using System.Text;
 
 namespace PoznajAI.Services

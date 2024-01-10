@@ -8,10 +8,6 @@ using PoznajAI.Models.Course;
 using PoznajAI.Models.User;
 using PoznajAI.Services;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PoznajAI.Controllers
 {
@@ -40,8 +36,8 @@ namespace PoznajAI.Controllers
         /// <response code="400">If the login information is incorrect.</response>
         /// <response code="500">If there was an error during login.</response>
         [HttpPost("login")]
-        [ProducesResponseType(typeof(DefaultResponse<string>),200)]
-        [ProducesResponseType(typeof(DefaultResponse<object>),400)]
+        [ProducesResponseType(typeof(DefaultResponse<string>), 200)]
+        [ProducesResponseType(typeof(DefaultResponse<object>), 400)]
         [ProducesResponseType(typeof(DefaultResponse<object>), 500)]
         public async Task<ActionResult<string>> Login(LoginRequestDto model)
         {
@@ -58,7 +54,7 @@ namespace PoznajAI.Controllers
                 var token = _jwtService.GenerateToken(userDto);
 
                 Log.Information("User logged in: {Email}", model.Email);
-                return Ok(new DefaultResponse<string>(200, "Successfully logged in!",true, token ));
+                return Ok(new DefaultResponse<string>(200, "Successfully logged in!", true, token));
             }
             catch (Exception ex)
             {
@@ -107,13 +103,13 @@ namespace PoznajAI.Controllers
 
                 if (addedUserDto == null)
                 {
-                    return BadRequest(new DefaultResponse<object>(400, "Username or password is incorrect.", false ));
+                    return BadRequest(new DefaultResponse<object>(400, "Username or password is incorrect.", false));
                 }
 
                 var token = _jwtService.GenerateToken(addedUserDto);
 
                 Log.Information("User registered: {Email}", model.Email);
-                return Ok(new DefaultResponse<object>(200, "Successfully registered!", true,token));
+                return Ok(new DefaultResponse<object>(200, "Successfully registered!", true, token));
             }
             catch (Exception ex)
             {
@@ -166,7 +162,7 @@ namespace PoznajAI.Controllers
                 {
                     return NotFound(new DefaultResponse<object>(404, "User not found.", false));
                 }
-                return Ok(new DefaultResponse<object>(200, "User succesfully retrieved.",true, user));
+                return Ok(new DefaultResponse<object>(200, "User succesfully retrieved.", true, user));
             }
             catch (Exception ex)
             {
@@ -201,7 +197,7 @@ namespace PoznajAI.Controllers
                 var userDto = await _jwtService.ValidateToken(token);
                 var courses = await _courseService.GetAllCoursesForUser(userDto);
 
-                return Ok(courses);
+                return Ok(new DefaultResponse<object>(200, "User courses successfuly retrieved", true, courses));
             }
             catch (Exception ex)
             {
@@ -236,7 +232,7 @@ namespace PoznajAI.Controllers
                 return Unauthorized(new DefaultResponse<object>(401, "Invalid token", false));
             }
 
-            return Ok(new DefaultResponse<object>(200, "User authenticated",false, userDto));
+            return Ok(new DefaultResponse<object>(200, "User authenticated", false, userDto));
         }
 
         /// <summary>
@@ -315,7 +311,7 @@ namespace PoznajAI.Controllers
                 }
 
                 Log.Information("Role added to user successfully. UserId: {UserId}, Role: {Role}", userId, role);
-                return Ok(new DefaultResponse<object>(200, "Role added to user successfully",true, user ));
+                return Ok(new DefaultResponse<object>(200, "Role added to user successfully", true, user));
             }
             catch (Exception ex)
             {

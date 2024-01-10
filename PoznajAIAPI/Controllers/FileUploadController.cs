@@ -1,13 +1,9 @@
-﻿using Hangfire;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using PoznajAI.Helpers;
 using PoznajAI.Models;
 using PoznajAI.Services.Video;
 using Serilog;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace PoznajAI.Controllers
 {
@@ -18,10 +14,14 @@ namespace PoznajAI.Controllers
         private const string TempFolder = "uploads\\temp";
         private const string VideosFolder = "uploads\\videos";
         private readonly IVideoConversionService _conversionService;
+        private readonly IFileHandler _fileService;
+        private readonly IHangfireJobEnqueuer _hangfireJobEnqueuer;
 
-        public FileUploadController(IVideoConversionService conversionService)
+        public FileUploadController(IVideoConversionService conversionService, IFileHandler fileService, IHangfireJobEnqueuer hangfireJobEnqueuer)
         {
             _conversionService = conversionService;
+            _fileService = fileService;
+            _hangfireJobEnqueuer = hangfireJobEnqueuer;
         }
 
         /// <summary>
@@ -47,17 +47,20 @@ namespace PoznajAI.Controllers
                     var fileName = Path.Combine(Path.GetRandomFileName().Split('.').First() + '.' + file.FileName.Split('.').Last());
                     var filePath = Path.Combine(Directory.GetCurrentDirectory(), TempFolder, fileName);
 
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    var success = await _fileService.SaveFile(filePath, file);
+
+                    if (success)
                     {
-                        await file.CopyToAsync(stream);
+                        _hangfireJobEnqueuer.Enqueue(() => _conversionService.ConvertVideo(filePath, CancellationToken.None));
+
+
+                        Log.Information("Uploaded file: {FileName}", fileName);
+
+                        return Ok(new DefaultResponse<object>(200, "File uploaded.", true, new { fileName }));
                     }
 
-                    BackgroundJob.Enqueue(() => _conversionService.ConvertVideo(filePath, CancellationToken.None));
-
-
-                    Log.Information("Uploaded file: {FileName}", fileName);
-
-                    return Ok(new DefaultResponse<object>(200, "File uploaded.", true, new { fileName }));
+                    Log.Error("File upload failed. Unable to save the file.");
+                    return StatusCode(500, new DefaultResponse<object>(500, "File upload failed. Unable to save the file.", false));
                 }
 
                 return BadRequest(new DefaultResponse<object>(400, "File is empty.", false));

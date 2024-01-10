@@ -2,12 +2,12 @@ using AutoMapper;
 using Hangfire;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using PoznajAI.Configuration;
 using PoznajAI.Configuration.Automapper;
 using PoznajAI.Data.Data;
 using PoznajAI.Extensions;
-using Serilog;
 using PoznajAI.Websockets.Client;
-using PoznajAI.Configuration;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;

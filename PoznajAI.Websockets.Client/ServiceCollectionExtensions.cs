@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Polly;
-using System;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace PoznajAI.Websockets.Client
 {
