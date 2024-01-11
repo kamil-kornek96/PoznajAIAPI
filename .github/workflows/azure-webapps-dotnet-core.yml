@@ -52,8 +52,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Replace JWT Settings in appsettings.json
-        run: sed -i "s|\"Issuer\":.*$|\"Issuer\": \"${{ secrets.JWT_ISSUER }}\",|g; s|\"Audience\":.*$|\"Audience\": \"${{ secrets.JWT_AUDIENCE }}\",|g; s|\"Key\":.*$|\"Key\": \"${{ secrets.JWT_KEY }}\",|g" PoznajAIAPI/appsettings.json
+      - name: Replace JWT Issuer in appsettings.json
+        run: sed -i "s|\"Issuer\":.*$|\"Issuer\": \"${{ secrets.JWT_ISSUER }}\",|g" PoznajAIAPI/appsettings.json
+
+      - name: Replace JWT Audience in appsettings.json
+        run: sed -i "s|\"Audience\":.*$|\"Audience\": \"${{ secrets.JWT_AUDIENCE }}\",|g" PoznajAIAPI/appsettings.json
+
+      - name: Replace JWT Key in appsettings.json
+        run: sed -i "s|\"Key\":.*$|\"Key\": \"${{ secrets.JWT_KEY }}\",|g" PoznajAIAPI/appsettings.json
 
       - name: Replace Connection Strings in appsettings.json
         run: sed -i "s|\"DefaultConnection\":.*$|\"DefaultConnection\": \"${{ secrets.DEFAULT_DATABASE_CONNECTION_STRING }}\",|g; s|\"HangfireConnection\":.*$|\"HangfireConnection\": \"${{ secrets.HANGFIRE_DATABASE_CONNECTION_STRING }}\",|g" PoznajAIAPI/appsettings.json
