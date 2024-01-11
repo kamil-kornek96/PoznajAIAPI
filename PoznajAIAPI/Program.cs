@@ -58,11 +58,14 @@ builder.Services.AddSwaggerSettings();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+    c.RoutePrefix = string.Empty;  // Dodaj tê liniê, aby Swagger by³ dostêpny bez dodatkowej œcie¿ki
+});
+
 
 app.UseRouting();
 app.UseCors("AllowLocalhost4200");
