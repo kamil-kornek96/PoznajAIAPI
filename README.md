@@ -104,7 +104,7 @@ Logging Settings:
 ```
 ## API Documentation
 
-Full API documentation is available here.
+Full API documentation is available [here](WIKI.md).
 
 ## Testing
 
