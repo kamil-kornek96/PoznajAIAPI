@@ -25,7 +25,7 @@ Poznaj AI is a .NET 7 (C#) REST API, with JWT authorization.
 - [.NET 7 SDK](https://dotnet.microsoft.com/download/dotnet/7.0)
 - SQL Server (or any compatible database)
 
-### Installation Steps(#instalation)
+### Installation Steps
 
 1. **Clone the repository:**
 
