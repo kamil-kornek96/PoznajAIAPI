@@ -20,10 +20,6 @@ namespace PoznajAI.Data.Models
         public string Email { get; set; }
 
         [Required]
-        [MaxLength(50)]
-        public string Username { get; set; }
-
-        [Required]
         [MaxLength(200)]
         public byte[] PasswordHash { get; set; }
 

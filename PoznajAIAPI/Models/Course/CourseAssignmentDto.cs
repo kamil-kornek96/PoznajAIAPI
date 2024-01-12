@@ -1,4 +1,4 @@
-﻿namespace PoznajAI.Controllers
+﻿namespace PoznajAI.Models.Course
 {
     public class CourseAssignmentDto
     {

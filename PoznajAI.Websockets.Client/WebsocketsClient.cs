@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Text;
 
 namespace PoznajAI.Websockets.Client
@@ -21,7 +20,7 @@ namespace PoznajAI.Websockets.Client
 
         public async void SendMessage(string message)
         {
-            using(ClientWebSocket client = new ClientWebSocket())
+            using (ClientWebSocket client = new ClientWebSocket())
             {
                 Uri serviceUri = new Uri("wss://localhost:44376/send");
                 var cancellationTokenSource = new CancellationTokenSource();
@@ -30,12 +29,12 @@ namespace PoznajAI.Websockets.Client
                 {
                     await client.ConnectAsync(serviceUri, cancellationTokenSource.Token);
                     var n = 0;
-                    while(client.State == WebSocketState.Open)
+                    while (client.State == WebSocketState.Open)
                     {
                         if (!string.IsNullOrEmpty(message))
                         {
                             ArraySegment<byte> byteToSend = new ArraySegment<byte>(Encoding.UTF8.GetBytes(message));
-                            await client.SendAsync(byteToSend,WebSocketMessageType.Text,true,cancellationTokenSource.Token);
+                            await client.SendAsync(byteToSend, WebSocketMessageType.Text, true, cancellationTokenSource.Token);
                             var responseBuffer = new byte[1024];
                             var offset = 0;
                             var packet = 1024;

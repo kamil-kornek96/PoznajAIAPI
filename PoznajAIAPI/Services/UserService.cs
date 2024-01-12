@@ -19,9 +19,9 @@ namespace PoznajAI.Services
             _mapper = mapper;
         }
 
-        public async Task<UserDto> Authenticate(string username, string password)
+        public async Task<UserDto> Authenticate(string email, string password)
         {
-            var user = await GetUserByName(username);
+            var user = await _userRepository.GetUserByEmail(email);
 
             if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
@@ -43,9 +43,9 @@ namespace PoznajAI.Services
             return _mapper.Map<UserDto>(user);
         }
 
-        public async Task<bool> IsUsernameTaken(string username)
+        public async Task<bool> IsEmailTaken(string email)
         {
-            return await _userRepository.UsernameExists(username);
+            return await _userRepository.EmailExists(email);
         }
 
         public async Task<Guid> CreateUser(UserCreateDto userDto)
@@ -93,12 +93,6 @@ namespace PoznajAI.Services
             }
 
             return true;
-        }
-
-        public async Task<User> GetUserByName(string username)
-        {
-            User user = await _userRepository.GetUserByUsername(username);
-            return user;
         }
 
         public async Task<bool> AddCourseToUser(Guid userId, Guid courseId)

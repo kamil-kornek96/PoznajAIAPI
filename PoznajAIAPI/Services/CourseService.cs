@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
-using PoznajAI.Controllers;
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
+using PoznajAI.Models.Course;
+using PoznajAI.Models.User;
 using Serilog;
 
 namespace PoznajAI.Services
@@ -17,18 +18,31 @@ namespace PoznajAI.Services
             _mapper = mapper;
         }
 
-        public async Task<UserCoursesResponseDto> GetAllCoursesForUser(Guid userId)
+        public async Task<UserCoursesResponseDto> GetAllCoursesForUser(UserDto user)
         {
             try
             {
-                var ownedCourses = await _courseRepository.GetAllCoursesForUser(userId);
+                var ownedCourses = await _courseRepository.GetAllCoursesForUser(user.Id);
                 var allCourses = await _courseRepository.GetAllCourses();
 
                 var availableCourses = allCourses.Except(ownedCourses).ToList();
 
+                var allCoursesDto = _mapper.Map<List<CourseDto>>(availableCourses);
+                if (!user.IsAdmin)
+                {
+                    allCoursesDto.ForEach(c =>
+                    {
+                        c.Lessons.ForEach(l =>
+                        {
+                            l.Duration = null;
+                            l.Id = Guid.Empty;
+                        });
+                    });
+                }
+
                 var responseDto = new UserCoursesResponseDto
                 {
-                    AllCourses = _mapper.Map<List<CourseDto>>(availableCourses),
+                    AllCourses = allCoursesDto,
                     OwnedCourses = _mapper.Map<List<OwnedCourseDto>>(ownedCourses)
                 };
 
@@ -41,16 +55,16 @@ namespace PoznajAI.Services
             }
         }
 
-        public async Task<Guid> CreateCourse(CourseCreateDto courseDto)
+        public async Task<CourseDto> CreateCourse(CourseCreateDto courseDto)
         {
             try
             {
                 var course = _mapper.Map<Course>(courseDto);
-                var createdCourseId = await _courseRepository.CreateCourse(course);
+                var createdCourse = await _courseRepository.CreateCourse(course);
 
                 Log.Information("Course created: {@Course}", course);
 
-                return createdCourseId;
+                return _mapper.Map<CourseDto>(createdCourse);
             }
             catch (Exception ex)
             {
@@ -58,6 +72,7 @@ namespace PoznajAI.Services
                 throw;
             }
         }
+
 
         public async Task<CourseDto> GetCourseById(Guid id)
         {

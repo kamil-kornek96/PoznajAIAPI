@@ -23,9 +23,9 @@ namespace PoznajAI.Data.Repositories
             return await _dbContext.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Id == userId);
         }
 
-        public async Task<User> GetUserByUsername(string username)
+        public async Task<User> GetUserByEmail(string email)
         {
-            return await _dbContext.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Username == username);
+            return await _dbContext.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Email == email);
         }
 
         public async Task<Guid> CreateUser(User user, UserRole role)
@@ -65,9 +65,9 @@ namespace PoznajAI.Data.Repositories
             return false;
         }
 
-        public async Task<bool> UsernameExists(string username)
+        public async Task<bool> EmailExists(string email)
         {
-            return await _dbContext.Users.AnyAsync(u => u.Username == username);
+            return await _dbContext.Users.AnyAsync(u => u.Email == email);
         }
 
         public async Task<bool> AddCourseToUser(Guid userId, Guid courseId)

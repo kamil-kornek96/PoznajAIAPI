@@ -1,4 +1,4 @@
-﻿namespace PoznajAI.Services
+﻿namespace PoznajAI.Models.Course
 {
     public class UserCoursesResponseDto
     {

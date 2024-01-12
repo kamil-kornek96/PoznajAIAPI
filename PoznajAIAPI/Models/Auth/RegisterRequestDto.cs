@@ -4,9 +4,6 @@ namespace PoznajAI.Models.Auth
 {
     public class RegisterRequestDto
     {
-        [Required]
-        [MaxLength(50)]
-        public string Username { get; set; }
 
         [Required]
         [MinLength(8)]
@@ -24,6 +21,7 @@ namespace PoznajAI.Models.Auth
         [Required]
         [MaxLength(50)]
         public string LastName { get; set; }
+
     }
 
 }

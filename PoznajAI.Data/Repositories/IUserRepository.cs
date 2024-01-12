@@ -10,8 +10,8 @@ namespace PoznajAI.Data.Repositories
         Task<bool> DeleteUser(Guid userId);
         Task<IEnumerable<User>> GetAllUsers();
         Task<User> GetUserById(Guid userId);
-        Task<User> GetUserByUsername(string username);
+        Task<User> GetUserByEmail(string username);
         Task UpdateUser(User user);
-        Task<bool> UsernameExists(string username);
+        Task<bool> EmailExists(string username);
     }
 }

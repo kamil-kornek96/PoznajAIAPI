@@ -1,4 +1,5 @@
 ﻿using PoznajAI.Data.Repositories;
+using PoznajAI.Helpers;
 using PoznajAI.Services;
 using PoznajAI.Services.Video;
 
@@ -12,6 +13,7 @@ namespace PoznajAI.Extensions
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<ILessonService, LessonService>();
             services.AddScoped<ICourseService, CourseService>();
+            services.AddScoped<IFileHandler, FileHandler>();
 
 
             services.AddScoped<IUserRepository, UserRepository>();
@@ -19,6 +21,7 @@ namespace PoznajAI.Extensions
             services.AddScoped<ICourseRepository, CourseRepository>();
 
             services.AddScoped<IVideoConversionService, VideoConversionService>();
+            services.AddSingleton<WebSocketService>();
 
             return services;
         }

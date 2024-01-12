@@ -39,6 +39,8 @@ namespace PoznajAI.Extensions
                 };
 
                 c.AddSecurityRequirement(securityRequirement);
+                var filePath = Path.Combine(System.AppContext.BaseDirectory, "PoznajAI.xml");
+                c.IncludeXmlComments(filePath);
             });
 
             return services;

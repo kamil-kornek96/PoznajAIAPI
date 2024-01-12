@@ -33,7 +33,6 @@ public class JwtService : IJwtService
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-            new Claim(ClaimTypes.Name, userDto.Username),
             new Claim(ClaimTypes.Email, userDto.Email),
             new Claim(ClaimTypes.Hash, userDto.Id.ToString())
             //new Claim(ClaimTypes.Role, userDto.Role) // Dodaj claim z rolą
