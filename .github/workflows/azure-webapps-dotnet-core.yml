@@ -64,6 +64,11 @@ jobs:
           files: '${{env.DOTNET_ROOT}}/myapp/appsettings.json'
         env:
           ConnectionStrings.DefaultConnection: ${{ secrets.DEFAULT_DATABASE_CONNECTION_STRING }}
+          ConnectionStrings.HangfireConnection: ${{ secrets.HANGFIRE_DATABASE_CONNECTION_STRING }}
+          Hangfire.AccessId: ${{ secrets.HANGFIRE_ACCESS_ID }}
+          JwtSettings.Issuer: ${{ secrets.JWT_ISSUER }}
+          JwtSettings.Audicence: ${{ secrets.JWT_AUDIENCE }}
+          JwtSettings.Key: ${{ secrets.JWT_KEY }}
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
