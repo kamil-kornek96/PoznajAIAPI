@@ -12,11 +12,8 @@ Poznaj AI is a .NET 7 (C#) REST API, with JWT authorization.
 - [Configuration](#configuration)
 - [API Documentation](#api-documentation)
 - [Testing](#testing)
-- [License](#license)
 - [Project Status](#project-status)
-- [Author](#author)
-- [Contributing](#contributing)
-- [Acknowledgments](#acknowledgments)
+
 
 ## Installation
 
@@ -58,13 +55,15 @@ Configure the `app.Settings.json` file for database settings:
   }
 }
 ```
-Running the Project
+### Running the Project
 Run the application:
 
-bash
-Copy code
+```bash
+dotnet build
 dotnet run
-Configuration
+```
+### Configuration
+
 Before running the application, modify the app.Settings.json file to set the following configurations:
 
 JWT Settings:
