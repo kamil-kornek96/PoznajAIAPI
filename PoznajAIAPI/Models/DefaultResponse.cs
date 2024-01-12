@@ -6,7 +6,7 @@
         {
 
         }
-        public DefaultResponse(int status, string message, bool success, T? data)
+        public DefaultResponse(int status, string message, bool success, T data)
         {
             Status = status;
             Message = message;
@@ -39,6 +39,6 @@
         /// <summary>
         /// Data (optional). This field accepts an object.
         /// </summary>
-        public T? Data { get; set; }
+        public T Data { get; set; }
     }
 }

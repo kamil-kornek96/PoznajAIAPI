@@ -16,7 +16,6 @@ public class HangfireAuthorizationFilter : IDashboardAuthorizationFilter
     public bool Authorize(DashboardContext context)
     {
         var httpContext = context.GetHttpContext();
-        StringValues authorizationHeader;
         var token = httpContext.Request.Query["token"].ToString();
         if (!String.IsNullOrEmpty(token))
         {
