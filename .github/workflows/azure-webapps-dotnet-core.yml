@@ -66,6 +66,9 @@ jobs:
         with:
           name: .net-app
 
+      - name: Set up working directory
+        run: cd ${{ github.workspace }}/${{ env.DOTNET_ROOT }}/myapp
+
       - name: Run tests
         run: dotnet test PoznajAIAPI/PoznajAIAPI.sln
   deploy:
