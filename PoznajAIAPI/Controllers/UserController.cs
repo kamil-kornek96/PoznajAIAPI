@@ -36,7 +36,7 @@ namespace PoznajAI.Controllers
         /// <response code="400">If the login information is incorrect.</response>
         /// <response code="500">If there was an error during login.</response>
         [HttpPost("login")]
-        [ProducesResponseType(typeof(DefaultResponse<string>), 200)]
+        [ProducesResponseType(typeof(DefaultResponse<TokenResponseDto>), 200)]
         [ProducesResponseType(typeof(DefaultResponse<object>), 400)]
         [ProducesResponseType(typeof(DefaultResponse<object>), 500)]
         public async Task<ActionResult<string>> Login(LoginRequestDto model)
@@ -54,7 +54,7 @@ namespace PoznajAI.Controllers
                 var token = _jwtService.GenerateToken(userDto);
 
                 Log.Information("User logged in: {Email}", model.Email);
-                return Ok(new DefaultResponse<string>(200, "Successfully logged in!", true, token));
+                return Ok(new DefaultResponse<TokenResponseDto>(200, "Successfully logged in!", true, token));
             }
             catch (Exception ex)
             {

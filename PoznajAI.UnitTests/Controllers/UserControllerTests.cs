@@ -19,7 +19,7 @@ namespace PoznajAI.UnitTests.Controllers
         private Mock<IUserService> _userServiceMock;
         private Mock<IJwtService> _jwtServiceMock;
         private Mock<ICourseService> _courseServiceMock;
-        private string _token;
+        private TokenResponseDto _token;
 
         [SetUp]
         public void Setup()
@@ -30,10 +30,10 @@ namespace PoznajAI.UnitTests.Controllers
 
             _userController = new UserController(_userServiceMock.Object, _jwtServiceMock.Object, _courseServiceMock.Object);
 
-            _token = "example_token";
+            _token = new TokenResponseDto { Token = "example_token" };
             var httpContext = new Mock<HttpContext>();
             var request = new Mock<HttpRequest>();
-            var headers = new HeaderDictionary { { "Authorization", _token } };
+            var headers = new HeaderDictionary { { "Authorization", _token.Token } };
             request.SetupGet(r => r.Headers).Returns(headers);
             httpContext.SetupGet(c => c.Request).Returns(request.Object);
             _userController.ControllerContext = new ControllerContext { HttpContext = httpContext.Object };
@@ -48,7 +48,7 @@ namespace PoznajAI.UnitTests.Controllers
                 Email = "test@example.com",
                 Password = "password"
             };
-            var expectedToken = "mocked.jwt.token";
+            TokenResponseDto expectedToken = new TokenResponseDto { Token = "mocked.jwt.token" };
             var userDto = new UserDto { Id = Guid.NewGuid(), Email = "test@example.com" };
 
             _userServiceMock.Setup(service => service.Authenticate(loginRequestDto.Email, loginRequestDto.Password))
@@ -63,7 +63,7 @@ namespace PoznajAI.UnitTests.Controllers
             Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
             var okResult = result.Result as OkObjectResult;
             Assert.That(okResult.StatusCode, Is.EqualTo(200));
-            Assert.That((okResult.Value as DefaultResponse<string>).Data, Is.EqualTo(expectedToken));
+            Assert.That((okResult.Value as DefaultResponse<TokenResponseDto>).Data, Is.EqualTo(expectedToken));
         }
 
         [Test]
@@ -163,7 +163,7 @@ namespace PoznajAI.UnitTests.Controllers
                 }
             };
 
-            _jwtServiceMock.Setup(service => service.ValidateToken(It.Is<string>(t => t == _token)))
+            _jwtServiceMock.Setup(service => service.ValidateToken(It.Is<string>(t => t == _token.Token)))
                 .ReturnsAsync(userDto);
             _courseServiceMock.Setup(service => service.GetAllCoursesForUser(It.IsAny<UserDto>()))
                 .ReturnsAsync(userCoursesResponseDto);
@@ -188,7 +188,7 @@ namespace PoznajAI.UnitTests.Controllers
             var userDto = new UserDto { Id = Guid.NewGuid(), Email = "test@example.com" };
 
             _jwtServiceMock.Setup(service => service.ValidateToken(It.Is<string>(t => t ==
-            _token)))
+            _token.Token)))
                 .ReturnsAsync(userDto);
 
             // Act
@@ -209,7 +209,7 @@ namespace PoznajAI.UnitTests.Controllers
             var courseId = Guid.NewGuid();
             var userDto = new UserDto { Id = userId, Email = "test@example.com" };
 
-            _jwtServiceMock.Setup(service => service.ValidateToken(It.Is<string>(t => t == _token)))
+            _jwtServiceMock.Setup(service => service.ValidateToken(It.Is<string>(t => t == _token.Token)))
                 .ReturnsAsync(userDto);
             _userServiceMock.Setup(service => service.AddCourseToUser(
                 It.Is<Guid>(id => id == userId),

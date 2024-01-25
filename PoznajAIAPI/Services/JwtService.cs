@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using PoznajAI.Models.Auth;
 using PoznajAI.Models.User;
 using PoznajAI.Services;
 using Serilog;
@@ -23,7 +24,7 @@ public class JwtService : IJwtService
         _audience = config["JwtSettings:Audicence"];
     }
 
-    public string GenerateToken(UserDto userDto)
+    public TokenResponseDto GenerateToken(UserDto userDto)
     {
         try
         {
@@ -44,12 +45,12 @@ public class JwtService : IJwtService
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            return new TokenResponseDto { Token = tokenHandler.WriteToken(token) };
         }
         catch (Exception ex)
         {
             Log.Error(ex, $"Could not create token. UserId: {userDto.Id}");
-            return string.Empty;
+            return new TokenResponseDto { Token = string.Empty };
         }
 
 
