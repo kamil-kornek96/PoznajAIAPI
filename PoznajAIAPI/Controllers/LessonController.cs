@@ -8,7 +8,7 @@ using Serilog;
 namespace PoznajAI.Controllers
 {
     [ApiController]
-    [EnableCors("AllowLocalhost4200")]
+    [EnableCors("DefaultPolicy")]
     [Route("api/lesson")]
     public class LessonController : ControllerBase
     {

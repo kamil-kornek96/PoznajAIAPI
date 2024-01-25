@@ -31,7 +31,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowLocalhost4200",
         builder =>
         {
-            builder.WithOrigins("http://localhost:4200", "https://poznajai-api.azurewebsites.net")
+            builder.WithOrigins("http://localhost:4200", "https://poznajai-angular.azurewebsites.net")
                    .AllowAnyHeader()
                    .AllowAnyMethod()
                    .AllowCredentials();
