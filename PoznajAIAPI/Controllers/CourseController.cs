@@ -43,7 +43,7 @@ namespace PoznajAI.Controllers
                     return NotFound(new DefaultResponse<object>(404, "Course not found.", false));
                 }
 
-                return Ok(new DefaultResponse<CourseDto>(200, "Course not found.", true, course));
+                return Ok(new DefaultResponse<CourseDto>(200, "Courses successfuly retrieved.", true, course));
             }
             catch (Exception ex)
             {
