@@ -13,5 +13,6 @@ namespace PoznajAI.Data.Repositories
         Task<User> GetUserByEmail(string username);
         Task UpdateUser(User user);
         Task<bool> EmailExists(string username);
+        Task<User> GetUserByActivationToken(string token);
     }
 }
