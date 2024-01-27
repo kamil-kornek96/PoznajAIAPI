@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using PoznajAI.Data.Models;
 using PoznajAI.Data.Repositories;
+using PoznajAI.Models.Auth;
 using PoznajAI.Models.User;
 using Serilog;
 using System.Security.Cryptography;
@@ -121,6 +122,29 @@ namespace PoznajAI.Services
                 Log.Error(ex, "An error occurred while adding a role to the user.");
                 throw;
             }
+        }
+
+        public async Task<ActivationResponseDto> ActivateUserEmail(string token)
+        {
+            var result = new ActivationResponseDto();
+            var user = await _userRepository.GetUserByActivationToken(token);
+
+            if(user != null)
+            {
+                if (user.IsEmailConfirmed)
+                {
+                    result.Success = false;
+                    result.Message = "Email already confirmed";
+                    return result;
+                }
+                user.IsEmailConfirmed = true;
+                await _userRepository.UpdateUser(user);
+                result.Success = true;
+                return result;
+            }
+            result.Success = false;
+            result.Message = "Wrong activation token";
+            return result;
         }
     }
 }
