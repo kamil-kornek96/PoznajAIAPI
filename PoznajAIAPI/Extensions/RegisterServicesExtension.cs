@@ -14,6 +14,7 @@ namespace PoznajAI.Extensions
             services.AddScoped<ILessonService, LessonService>();
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IFileHandler, FileHandler>();
+            services.AddScoped<IEmailService, EmailService>();
 
 
             services.AddScoped<IUserRepository, UserRepository>();
