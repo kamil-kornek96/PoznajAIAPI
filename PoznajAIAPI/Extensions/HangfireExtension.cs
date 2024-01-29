@@ -14,6 +14,7 @@ namespace PoznajAI.Extensions
 
             services.AddHangfireServer();
             services.AddTransient<HangfireAuthorizationFilter>();
+            services.AddScoped<IHangfireJobEnqueuer, HangfireJobEnqueuer>();
 
 
 
