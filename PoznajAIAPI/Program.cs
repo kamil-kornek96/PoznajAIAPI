@@ -28,7 +28,7 @@ builder.Services.AddSingleton(mapper);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalhost4200",
+    options.AddPolicy("DefaultPolicy",
         builder =>
         {
             builder.WithOrigins("http://localhost:4200", "https://poznajai-angular.azurewebsites.net")
@@ -67,7 +67,7 @@ app.UseSwaggerUI(c =>
 
 app.UseHttpsRedirection();
 app.UseRouting();
-app.UseCors("AllowLocalhost4200");
+app.UseCors("DefaultPolicy");
 ConfigManager.ConfigureWebsockets(app);
 ConfigManager.ConfigureVideoConversionHub(app);
 ConfigManager.ConfigureHangFire(app);

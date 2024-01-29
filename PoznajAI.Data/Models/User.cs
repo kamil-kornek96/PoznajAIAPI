@@ -26,7 +26,10 @@ namespace PoznajAI.Data.Models
         [Required]
         [MaxLength(200)]
         public byte[] PasswordSalt { get; set; }
+        [MaxLength(100)]
+        public string EmailConfirmationToken { get; set; }
 
+        public bool IsEmailConfirmed { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

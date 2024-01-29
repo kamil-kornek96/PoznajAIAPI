@@ -32,6 +32,8 @@ namespace PoznajAI.Data.Repositories
         {
             try
             {
+                user.EmailConfirmationToken = GenerateUniqueEmailConfirmationToken();
+                user.IsEmailConfirmed = false;
                 await _dbContext.Users.AddAsync(user);
                 await _dbContext.SaveChangesAsync();
 
@@ -121,6 +123,16 @@ namespace PoznajAI.Data.Repositories
             await _dbContext.SaveChangesAsync();
 
             return user;
+        }
+
+        private string GenerateUniqueEmailConfirmationToken()
+        {
+            return Guid.NewGuid().ToString();
+        }
+
+        public async Task<User> GetUserByActivationToken(string token)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(u => u.EmailConfirmationToken == token);
         }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using PoznajAI.Data.Models;
+using PoznajAI.Models.Auth;
 using PoznajAI.Models.User;
 
 namespace PoznajAI.Services
 {
     public interface IUserService
     {
+        Task<ActivationResponseDto> ActivateUserEmail(string token);
         Task<bool> AddCourseToUser(Guid userId, Guid courseId);
         Task<UserDto> AddUserRoleAsync(Guid userId, UserRole role);
         Task<UserDto> Authenticate(string email, string password);

@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 using PoznajAI.Data.Models;
 using PoznajAI.Models;
 using PoznajAI.Models.Auth;
@@ -8,6 +12,7 @@ using PoznajAI.Models.Course;
 using PoznajAI.Models.User;
 using PoznajAI.Services;
 using Serilog;
+
 
 namespace PoznajAI.Controllers
 {
@@ -19,12 +24,14 @@ namespace PoznajAI.Controllers
         private readonly IUserService _userService;
         private readonly ICourseService _courseService;
         private readonly IJwtService _jwtService;
+        private readonly IEmailService _emailService;
 
-        public UserController(IUserService userService, IJwtService jwtService, ICourseService courseService)
+        public UserController(IUserService userService, IJwtService jwtService, ICourseService courseService, IEmailService emailService)
         {
             _userService = userService;
             _jwtService = jwtService;
             _courseService = courseService;
+            _emailService = emailService;
         }
 
         /// <summary>
@@ -49,6 +56,12 @@ namespace PoznajAI.Controllers
                 {
                     Log.Warning("Login failed for user with email: {Email}", model.Email);
                     return BadRequest(new DefaultResponse<object>(400, "Username or password is incorrect.", false));
+                }
+
+                if (!userDto.IsEmailConfirmed)
+                {
+                    Log.Warning("Login failed, because of not activated account, for user with email: {Email}", model.Email);
+                    return BadRequest(new DefaultResponse<object>(400, "Account not activated", false));
                 }
 
                 var token = _jwtService.GenerateToken(userDto);
@@ -106,10 +119,13 @@ namespace PoznajAI.Controllers
                     return BadRequest(new DefaultResponse<object>(400, "Username or password is incorrect.", false));
                 }
 
-                var token = _jwtService.GenerateToken(addedUserDto);
+                var requestUrlWithoutPath = new Uri(HttpContext.Request.GetDisplayUrl()).GetLeftPart(UriPartial.Authority);
+
+
+                await _emailService.SendEmailActivationMessage(userId, requestUrlWithoutPath);
 
                 Log.Information("User registered: {Email}", model.Email);
-                return Ok(new DefaultResponse<object>(200, "Successfully registered!", true, token));
+                return Ok(new DefaultResponse<object>(200, "Successfully registered!", true, null));
             }
             catch (Exception ex)
             {
@@ -317,6 +333,34 @@ namespace PoznajAI.Controllers
             {
                 Log.Error(ex, "Error adding role to user");
                 return StatusCode(500, new DefaultResponse<object>(500, "Error adding role to user", false));
+            }
+        }
+
+
+        /// <summary>
+        /// Activate user account with help of activation token
+        /// </summary>
+        /// <param name="token">Activation token (sended to user email)</param>
+        /// <returns>Information whether activation was successful</returns>
+        /// <response code="200">If activation was successful</response>
+        /// <response code="400">If the token was invalid or the account has already been activated.</response>
+        /// <response code="500">If an unexpected error occurred during activation</response>
+        [HttpPost("activate")]
+        public async Task<IActionResult> ActivateEmail([FromBody] TokenResponseDto token)
+        {
+            try
+            {
+                var activation = await _userService.ActivateUserEmail(token.Token);
+                if (activation.Success)
+                {
+                    return Ok(new DefaultResponse<object>(200, "Email activated", true, null));
+                }
+                return BadRequest(new DefaultResponse<object>(400, activation.Message, true, null));
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error while email activation");
+                return StatusCode(500, new DefaultResponse<object>(500, "Error while email activation", false));
             }
         }
 
